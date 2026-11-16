@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex,nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>[15억 오버] 내 집 마련 판단 도구</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--navy:#0f2a4a;--navy2:#1b3a63;--bg:#f3f5f8;--card:#fff;--ink:#14213a;--muted:#5d6a7e;--line:#e1e6ee;--soft:#eef2f8;--accent:#1b3a63;--good:#1f7a55;--warn:#b27a1a;--bad:#b3261e;--gold:#c49a3a}
+@media (prefers-color-scheme:dark){:root{--bg:#0b1422;--card:#122036;--ink:#e6ecf5;--muted:#9aa8bd;--line:#22324c;--soft:#17294a;--accent:#8fb3e0;--good:#5fc28a;--bad:#ef7b72;--warn:#e0b05a}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Noto Sans KR",system-ui,sans-serif;font-size:14.5px;line-height:1.6;word-break:keep-all;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
+.hero{background:linear-gradient(135deg,var(--navy),var(--navy2));color:#fff;padding:26px 0 20px}
+.in{max-width:1120px;margin:0 auto;padding:0 18px}
+.eyebrow{font-size:11.5px;letter-spacing:.14em;color:#a9bfdc;font-weight:500}
+.hero h1{font-size:25px;margin:4px 0 6px}
+.hero p{margin:0;color:#c9d6e8;font-size:13px}
+nav{position:sticky;top:0;z-index:5;background:var(--card);border-bottom:1px solid var(--line);box-shadow:0 1px 3px rgba(15,42,74,.06)}
+nav .in{display:flex;overflow-x:auto;gap:2px}
+nav a{font-size:13px;padding:11px 12px;color:var(--muted);text-decoration:none;white-space:nowrap;font-weight:500;border-bottom:2px solid transparent}
+nav a:hover{color:var(--accent);border-bottom-color:var(--accent)}
+section{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:22px;margin:18px 0;box-shadow:0 1px 2px rgba(15,42,74,.04)}
+h2{font-size:17px;margin:0 0 14px;padding-left:10px;border-left:3px solid var(--accent);line-height:1.3}
+h3{font-size:14px;margin:18px 0 8px}
+.top{display:grid;grid-template-columns:360px 1fr;gap:18px;align-items:start}
+@media(max-width:900px){.top{grid-template-columns:1fr}}
+.inputs{position:sticky;top:56px}
+@media(max-width:900px){.inputs{position:static}}
+.fg{margin-bottom:11px}
+.fg label{display:block;font-size:12px;color:var(--muted);font-weight:500;margin-bottom:3px}
+.fg input,.fg select{width:100%;font:inherit;padding:8px 10px;border:1px solid var(--line);border-radius:4px;background:var(--soft);color:var(--ink)}
+.fg input{text-align:right}
+.fg .hint{font-size:11px;color:var(--muted);margin-top:2px}
+.grp{font-size:11.5px;font-weight:700;color:var(--accent);letter-spacing:.04em;margin:14px 0 8px;padding-top:10px;border-top:1px solid var(--line)}
+.grp:first-of-type{border-top:0;padding-top:0;margin-top:0}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.verdict{border-radius:6px;padding:18px 20px;color:#fff;background:var(--navy2)}
+.verdict.ok{background:linear-gradient(135deg,#145a3f,#1f7a55)}
+.verdict.no{background:linear-gradient(135deg,#7d1d17,#b3261e)}
+.verdict .lab{font-size:12px;opacity:.85;letter-spacing:.06em}
+.verdict .big{font-size:24px;font-weight:700;margin:4px 0 6px;line-height:1.35}
+.verdict ul{margin:8px 0 0;padding-left:18px;font-size:13.5px}
+.verdict li{margin:3px 0}
+.kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}
+@media(max-width:560px){.kpis{grid-template-columns:1fr 1fr}}
+.kpi{border:1px solid var(--line);border-top:3px solid var(--accent);border-radius:4px;padding:10px 12px}
+.kpi .l{font-size:11.5px;color:var(--muted)}
+.kpi .v{font-size:18px;font-weight:700;margin-top:2px}
+.kpi .n{font-size:11.5px;color:var(--muted)}
+.flags{margin-top:12px}
+.flag{font-size:13px;padding:8px 12px;border-left:3px solid var(--warn);background:color-mix(in srgb,var(--warn) 9%,transparent);margin:6px 0}
+.flag.info{border-left-color:var(--accent);background:var(--soft)}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{padding:8px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+thead th{background:var(--soft);color:var(--muted);font-weight:500;font-size:12px;white-space:nowrap}
+td.num,th.num{text-align:right;white-space:nowrap}
+.tw{overflow-x:auto}
+tr.sum td{font-weight:700;border-top:2px solid var(--line)}
+.pos{color:var(--good)}.neg{color:var(--bad)}
+.tag{display:inline-block;font-size:11px;padding:1px 7px;border-radius:3px;font-weight:500;white-space:nowrap}
+.tag.ok{color:var(--good);background:color-mix(in srgb,var(--good) 12%,transparent)}
+.tag.fix{color:var(--bad);background:color-mix(in srgb,var(--bad) 10%,transparent)}
+.tag.add{color:var(--accent);background:var(--soft)}
+.note{font-size:11.5px;color:var(--muted);margin-top:8px;line-height:1.55}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+@media(max-width:900px){.grid3{grid-template-columns:1fr}}
+.card p{margin:4px 0 0;font-size:13.5px;color:var(--ink)}
+.notice{font-size:13px;padding:7px 12px;border-left:3px solid var(--accent);background:var(--soft);margin:5px 0}.notice.watch{border-left-color:var(--warn);background:color-mix(in srgb,var(--warn) 9%,transparent)}
+.road{list-style:none;padding:0;margin:0}.road li{display:grid;grid-template-columns:110px 1fr;gap:14px;padding:12px 0;border-bottom:1px solid var(--line)}
+.road .when{font-weight:700;color:var(--accent);font-size:13px}.road .what b{display:block;margin-bottom:2px}.road .what span{font-size:13px;color:var(--muted)}
+.road .ok{color:var(--good);font-weight:700}.road .ng{color:var(--bad);font-weight:700}
+@media(max-width:560px){.road li{grid-template-columns:1fr;gap:2px}}
+.pathtag{display:inline-block;background:var(--navy2);color:#fff;font-size:12px;padding:3px 10px;border-radius:3px;margin-bottom:8px}
+@media(max-width:760px){.grid2{grid-template-columns:1fr}}
+.card{border:1px solid var(--line);border-radius:6px;padding:14px 16px}
+.card h3{margin-top:0}
+.card ul{margin:6px 0 0;padding-left:18px}.card li{margin:4px 0}
+.steps{counter-reset:s;list-style:none;padding:0;margin:0}
+.steps li{counter-increment:s;padding:10px 0 10px 40px;position:relative;border-bottom:1px solid var(--line)}
+.steps li:before{content:counter(s);position:absolute;left:0;top:10px;width:26px;height:26px;border-radius:50%;background:var(--navy2);color:#fff;font-size:12px;display:flex;align-items:center;justify-content:center;font-weight:700}
+details{border:1px solid var(--line);border-radius:6px;padding:0 14px;margin:8px 0}
+details summary{cursor:pointer;padding:11px 0;font-weight:500}
+details[open] summary{border-bottom:1px solid var(--line);margin-bottom:8px}
+details .body{padding-bottom:12px;font-size:13.5px}
+a{color:var(--accent)}
+#scTbl td:nth-child(n+2),#gcTbl td:nth-child(n+2){white-space:nowrap}
+.filters{display:grid;grid-template-columns:repeat(4,1fr);gap:8px 10px}
+@media(max-width:760px){.filters{grid-template-columns:1fr 1fr}.c-hm{display:none}}
+.controls{margin-bottom:10px}.seg{display:inline-flex;border:1px solid var(--line);border-radius:4px;overflow:hidden;flex-wrap:wrap}
+.seg button{font:inherit;font-size:12.5px;padding:6px 12px;border:0;border-right:1px solid var(--line);background:var(--card);color:var(--muted);cursor:pointer}.seg button:last-child{border-right:0}.seg button.on{background:var(--navy2);color:#fff}
+.more{display:block;width:100%;margin-top:10px;font:inherit;font-size:12.5px;padding:9px;border:1px solid var(--line);border-radius:4px;background:var(--card);color:var(--accent);cursor:pointer;font-weight:500}
+.t-seoul{color:#fff;background:var(--navy2)}.t-gg_reg{color:var(--navy2);background:var(--soft)}.t-gg_non{color:var(--good);background:color-mix(in srgb,var(--good) 12%,transparent)}
+#candTbl td:nth-child(n+2),#popTbl td:nth-child(n+2){white-space:nowrap}
+@media(max-width:760px){#popSeg button{padding:6px 9px}}
+.sec-h{cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:0!important}
+.sec-h:after{content:"펼치기 ▾";font-size:12px;font-weight:500;color:var(--accent);border:1px solid var(--line);border-radius:4px;padding:3px 10px;white-space:nowrap;flex:none}
+section.open .sec-h:after{content:"접기 ▴"}
+section.open .sec-h{margin-bottom:14px!important}
+section.collapsible:not(.open) .sbody{display:none}
+.route{font-size:11px;color:var(--muted);white-space:normal;max-width:220px;margin-left:auto;line-height:1.35}
+.kinfo{font-size:11px;color:var(--ink);opacity:.8;margin-top:2px;white-space:normal;line-height:1.4}
+.kinfo.edu{color:var(--muted);opacity:1}
+#candTbl td:first-child,#popTbl td:first-child{min-width:150px}
+@media(max-width:760px){#popTbl th:nth-child(3),#popTbl td:nth-child(3),#popTbl th:nth-child(5),#popTbl td:nth-child(5),#candTbl th:nth-child(3),#candTbl td:nth-child(3){display:none}#candTbl td:first-child,#popTbl td:first-child{min-width:140px}}
+#gate{position:fixed;inset:0;z-index:100;background:rgba(11,20,34,.92);display:flex;align-items:center;justify-content:center;padding:20px}
+#gate .box{background:var(--card);color:var(--ink);border-radius:8px;padding:26px 24px;width:100%;max-width:360px;box-shadow:0 10px 40px rgba(0,0,0,.35)}
+#gate h3{margin:0 0 6px;font-size:18px}#gate p{margin:0 0 14px;font-size:13px;color:var(--muted)}
+#gate input{width:100%;font:inherit;font-size:18px;letter-spacing:.2em;text-align:center;padding:10px;border:1px solid var(--line);border-radius:6px;background:var(--soft);color:var(--ink)}
+#gate button{width:100%;margin-top:12px;font:inherit;font-weight:700;padding:11px;border:0;border-radius:6px;background:var(--navy2);color:#fff;cursor:pointer}
+#gate button:disabled{opacity:.4;cursor:default}#gate .err{font-size:12px;color:var(--bad);min-height:18px;margin-top:6px}
+body.locked{overflow:hidden}
+footer{max-width:1120px;margin:0 auto;padding:0 18px 40px;font-size:11.5px;color:var(--muted)}
+</style>
+</head>
+<body>
+<script>window.LOG_URL="https://script.google.com/macros/s/AKfycbxKD1RRL6s2QHzhcztt68V_bHoOcgVaadQ0PHyMcn7-I9kU6x9ReqAeCz1d3wNe5rDL8g/exec";</script>
+<div id="gate"><form class="box" id="gateForm" autocomplete="off">
+  <h3>이름을 입력해 주세요</h3>
+  <p>한글 이름 3글자를 입력해야 볼 수 있습니다. 입장 기록(이름·시간)이 남습니다.</p>
+  <input id="gateName" maxlength="3" inputmode="text" placeholder="홍길동" aria-label="이름 3글자">
+  <div class="err" id="gateErr"></div>
+  <button type="submit" id="gateBtn" disabled>들어가기</button>
+</form></div>
+<script>
+(function(){document.body.classList.add('locked');const i=document.getElementById('gateName'),b=document.getElementById('gateBtn'),e=document.getElementById('gateErr');
+const ok=v=>/^[가-힣]{3}$/.test(v);
+i.addEventListener('input',()=>{const v=i.value.trim();b.disabled=!ok(v);e.textContent=v.length===3&&!ok(v)?'한글 3글자만 입력할 수 있습니다.':''});
+document.getElementById('gateForm').addEventListener('submit',ev=>{ev.preventDefault();const v=i.value.trim();if(!ok(v)){e.textContent='한글 이름 3글자를 입력해 주세요.';return}
+  try{if(window.LOG_URL&&LOG_URL.startsWith('https://'))fetch(LOG_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({name:v,page:'15억 오버',device:/Mobi/i.test(navigator.userAgent)?'모바일':'PC'})})}catch(_){}
+  document.getElementById('gate').remove();document.body.classList.remove('locked')});
+setTimeout(()=>i.focus(),50)})();
+</script>
+<div class="hero"><div class="in">
+  <h1>[15억 오버] 내 집 마련 판단 도구</h1>
+  <p>내 조건을 입력하면 ① 결론 ② 나의 현실적인 순서 ③ 계산 근거 ④ 후보 지역 순으로 보여줍니다. 금액 단위: 만원 (1억 = 10000).</p>
+  <p style="margin-top:6px;font-size:12px;color:#a9bfdc">규정·후보 데이터 매일 자동 갱신 · 규정 확인일 <b id="rulesUpd">—</b> · 후보 데이터 <b id="dataUpd">—</b></p>
+</div></div>
+<nav><div class="in">
+  <a href="#first">먼저 알아둘 것</a><a href="#calc">결론</a><a href="#roadmap">나의 순서</a><a href="#detail">계산 근거</a><a href="#rules">15억 초과 규칙</a><a href="#areas">지역별 비중</a><a href="#finder">단지 찾기</a><a href="#popular">인기 지역 단지</a><a href="#marriage">A 결혼 전 매수</a><a href="#firstbuy">B 결혼 후 생애최초</a><a href="#basics">필수 지식</a><a href="#policy">정책대출·추가자금</a>
+</div></nav>
+<div class="in">
+
+<section id="first">
+<h2>먼저 알아둘 것 3가지</h2>
+<div class="grid3">
+  <div class="card"><h3>1. 서울은 "전세 끼고 사두기"가 안 됩니다</h3><p>서울 아파트는 사면 직접 들어가 2년 살아야 합니다(토지거래허가구역). 세입자 있는 집은 무주택자만 입주를 미룰 수 있고, 그래도 2029년까지는 들어가 살아야 합니다. 경기·인천 비규제 지역은 이 의무가 없습니다.</p></div>
+  <div class="card"><h3>2. 서울은 대출이 집값의 40%까지</h3><p>5억 집이면 대출 2억, 나머지 3억+세금은 내 돈이어야 합니다. 처음 집을 사는 사람(생애최초)은 70%까지 가능. 연봉이 낮으면 이보다 더 줄어듭니다.</p></div>
+  <div class="card"><h3>3. "집을 한 번도 안 가져본 것"이 자산입니다</h3><p>생애최초 대출(70%), 생애최초·신혼부부 청약, 취득세 감면은 무주택일 때만 쓸 수 있습니다. 한 번 사면 일부는 영구히 사라집니다.</p></div>
+</div>
+<h3>최근 규정 변동</h3>
+<div id="notices"></div>
+</section>
+
+<section id="rules">
+<h2>15억 넘는 집을 살 때 달라지는 것</h2>
+<div class="grid3">
+  <div class="card"><h3>대출 상한이 크게 줄어듦</h3><p>집값 15억 이하는 최대 6억, <b>15억 초과~25억은 최대 4억, 25억 초과는 최대 2억</b>. 생애최초(LTV 70%)여도 이 상한은 같음. 20억 집이면 현금 16억+세금이 필요.</p></div>
+  <div class="card"><h3>세금·비용 단가가 올라감</h3><p>취득세 약 3.3%(85㎡ 초과는 약 3.5%), 중개보수 상한 0.7%. 20억 집이면 부대비용만 약 8천만원. 공시가격이 높으면 매년 종합부동산세 대상.</p></div>
+  <div class="card"><h3>서울·경기 규제지역 규칙은 동일</h3><p>토지거래허가로 매수 후 2년 실거주. 전세 낀 매수는 무주택자 입주 유예 조건에서만 가능. 1주택 보유 중이면 수도권 대출 불가.</p></div>
+</div>
+<div class="note">규제지역 목록: <span id="regList"></span>. 매수 직전 재지정·해제 여부 재확인 필요.</div>
+</section>
+
+<section id="calc">
+<h2>조건 입력 및 결론</h2>
+<div class="top">
+<div class="inputs card">
+  <div class="grp">인생 계획</div>
+  <div class="row2">
+    <div class="fg"><label>결혼 예상 연도</label><select id="marry"><option value="0">미정</option></select></div>
+    <div class="fg"><label>시장 전망</label><select id="outlook"><option value="down">27~29년 하락 예상</option><option value="flat">판단 보류</option><option value="up">상승 예상</option></select></div>
+  </div>
+  <div class="fg"><label>월 저축 가능액 (만원)</label><input id="save" type="number" step="10" value="200"><div class="hint">순서 제안의 연도별 예상 현금 계산에 사용</div></div>
+  <div class="grp">매수 대상</div>
+  <div class="fg"><label>매수 가격 (만원)</label><input id="price" type="number" step="1000" value="200000"><div class="hint" id="priceHint"></div></div>
+  <div class="fg"><label>지역</label><select id="region"><option value="reg">규제지역 (서울 전역·경기 15곳)</option><option value="nonreg">수도권 비규제 (부천·인천·김포·고양 등)</option></select></div>
+  <div class="fg"><label>매수 방식</label><select id="mode"><option value="live">직접 입주 (주담대 활용)</option><option value="gap">세입자 있는 집 매수 (전세보증금 승계)</option></select></div>
+  <div class="fg" id="jeonseBox"><label>승계할 전세보증금 (만원)</label><input id="jeonse" type="number" step="1000" value="35000"></div>
+  <div class="grp">차주 조건</div>
+  <div class="fg"><label>주택 보유</label><select id="own"><option value="none">무주택 (과거 보유 이력 없음)</option><option value="past">무주택 (과거 보유 이력 있음)</option><option value="one">1주택 (처분 조건부)</option><option value="keep">1주택 (계속 보유)</option></select></div>
+  <div class="fg"><label>세전 연소득 (만원, 부부합산 가능)</label><input id="income" type="number" step="100" value="6000"><div class="hint">본인 실제 연봉으로 교체</div></div>
+  <div class="row2">
+    <div class="fg"><label>주담대 금리 (%)</label><input id="rate" type="number" step="0.05" value="4.2"></div>
+    <div class="fg"><label>만기 (년)</label><input id="term" type="number" step="5" value="30"></div>
+  </div>
+  <div class="fg"><label>금리 유형</label><select id="rtype"><option value="cyc">5년 이상 주기형 (스트레스 40% 반영)</option><option value="mix">혼합형 (스트레스 80% 반영)</option><option value="var">변동형 (스트레스 100% 반영)</option></select></div>
+  <div class="fg"><label>주담대 상환 방법</label><select id="lmeth"><option value="eq">원리금균등 (매달 같은 금액)</option><option value="prin">원금균등 (처음 많이, 점점 감소)</option></select></div>
+  <div class="fg"><label>보유 신용대출·마통 한도 (만원)</label><input id="credit" type="number" step="500" value="0"></div>
+  <div class="grp">보유·조달 자금</div>
+  <div class="fg"><label>보유 현금 (만원)</label><input id="cash" type="number" step="500" value="10000"></div>
+  <div class="fg"><label>퇴직연금 중도인출 (만원)</label><input id="dc" type="number" step="500" value="0"></div>
+  <div class="row2">
+    <div class="fg"><label>사내대출 (만원)</label><input id="corp" type="number" step="500" value="0"></div>
+    <div class="fg"><label>사내대출 금리 (%)</label><input id="crate" type="number" step="0.1" value="2.0"></div>
+  </div>
+  <div class="row2">
+    <div class="fg"><label>사내대출 기간 (년)</label><input id="cterm" type="number" step="1" value="10"></div>
+    <div class="fg"><label>사내대출 상환 방법</label><select id="cmeth"><option value="eq">원리금균등</option><option value="prin">원금균등</option><option value="bullet">만기일시 (이자만 내다가 만기에 원금)</option></select></div>
+  </div>
+  <div class="row2">
+    <div class="fg"><label>약관·예적금담보대출</label><input id="ins" type="number" step="500" value="0"></div>
+    <div class="fg"><label>가족 증여·차용</label><input id="family" type="number" step="500" value="0"></div>
+  </div>
+  <div class="note">입력값은 이 브라우저에만 저장됩니다.</div>
+</div>
+
+<div>
+  <div class="verdict" id="verdict"><div class="lab">결론</div><div class="big">계산 중…</div></div>
+  <div class="kpis" id="kpis"></div>
+  <div class="flags" id="flags"></div>
+  <div id="roadmap" style="margin-top:18px">
+  <h2 style="margin-top:4px">나의 현실적인 순서</h2>
+  <div class="note" style="margin:-6px 0 10px">결혼 예상 연도·시장 전망·월 저축액·현재 자금 기준으로 자동 구성. 입력을 바꾸면 순서도 바뀝니다.</div>
+  <div id="roadBox"></div>
+  </div>
+</div>
+</div>
+</section>
+
+<section id="detail">
+<h2>계산 근거</h2>
+<div>
+  <h3>① 주담대 한도 산출 (가장 낮은 값이 최종 한도)</h3>
+  <div class="note" style="margin:-4px 0 6px">DSR 한도는 은행 기본 산정 방식(원리금균등) 기준. 원금균등은 초기 상환액이 커서 실제 한도가 다소 줄 수 있음.</div>
+  <div class="tw"><table><thead><tr><th>기준</th><th>산식</th><th class="num">금액</th></tr></thead><tbody id="loanTbl"></tbody></table></div>
+
+  <h3>② 필요 자금 vs 조달 가능 자금</h3>
+  <div class="grid2">
+    <div class="tw"><table><thead><tr><th>필요 자금</th><th class="num">금액</th></tr></thead><tbody id="needTbl"></tbody></table></div>
+    <div class="tw"><table><thead><tr><th>조달 자금</th><th class="num">금액</th></tr></thead><tbody id="haveTbl"></tbody></table></div>
+  </div>
+  <div class="note">주: 취득세는 1주택 85㎡ 이하 기준(6억 이하 1.1%, 6~9억 구간 약 1.1~3.3%, 9억 초과 3.3%, 지방교육세 포함). 생애최초는 12억 이하 최대 200만원 감면. 중개보수는 법정 상한(2억~9억 0.4%, 9억~12억 0.5%, 12억~15억 0.6%, 15억 초과 0.7%). 법무·등기·이사 등 기타비용은 가격의 0.3%로 가정.</div>
+</div>
+</section>
+
+<section id="areas">
+<h2>지역별 15억 초과 거래 비중</h2>
+<div class="note" style="margin:-6px 0 10px">집계: <span id="asof"></span>, 전용 40㎡ 이상 아파트 매매(해제 제외). 여의도역(5·9호선) 도착 기준 지하철·광역철도 대략 시간. 지역 대표역 탑승~도착, 환승 포함, 집→역 도보·배차 대기 제외. 출퇴근 시간대·단지 위치에 따라 달라지므로 단지별로는 지도 앱 길찾기로 확인.</div>
+<div class="tw"><table id="areaTbl"><thead><tr><th>지역</th><th class="num">여의도(지하철)</th><th class="num c-hm">전체 거래</th><th class="num">15억 초과 거래</th><th class="num">비중</th><th class="num">15억 초과 중위</th></tr></thead><tbody></tbody></table></div>
+<button class="more" id="areaMore"></button>
+</section>
+
+<section id="finder">
+<h2>단지 찾기 (최근 6개월 중위가 15억 초과)</h2>
+<div class="filters">
+  <div class="fg"><label>가격대</label><select id="fPrice"><option value="all">전체</option><option value="15-20">15~20억</option><option value="20-25">20~25억</option><option value="25-30">25~30억</option><option value="30-999">30억 초과</option></select></div>
+  <div class="fg"><label>지역</label><select id="fArea"><option value="all">전체</option></select></div>
+  <div class="fg"><label>전용면적</label><select id="fSize"><option value="all">전체</option><option value="40-62">59㎡대 이하 (~24평)</option><option value="63-86">84㎡대 (25~34평)</option><option value="87-999">85㎡ 초과 (35평~)</option></select></div>
+  <div class="fg"><label>준공</label><select id="fBuilt"><option value="0">전체</option><option value="2015">2015년 이후</option><option value="2005">2005년 이후</option></select></div>
+  <div class="fg"><label>여의도 통근 (지하철)</label><select id="fCom"><option value="999">전체</option><option value="20">20분 이내</option><option value="30">30분 이내</option><option value="45">45분 이내</option></select></div>
+  <div class="fg"><label>세대수</label><select id="fHH"><option value="0">전체</option><option value="300">300세대 이상</option><option value="500">500세대 이상</option><option value="1000">1,000세대 이상</option></select></div>
+  <div class="fg"><label>지하철역 도보</label><select id="fSub"><option value="0">전체</option><option value="5">5분 이내</option><option value="10">10분 이내</option><option value="15">15분 이내</option></select></div>
+  <div class="fg"><label>정렬</label><select id="fSort"><option value="rep">지역별 대표 단지</option><option value="n">거래 많은 순</option><option value="price">가격 낮은 순</option><option value="built">최신 준공 순</option><option value="com">통근 짧은 순</option></select></div>
+</div>
+<div class="note" id="candCount" style="margin:8px 0"></div>
+<div class="tw"><table id="candTbl"><thead><tr><th>단지</th><th>전용</th><th>준공</th><th class="num">최근 거래</th><th class="num">6개월 중위</th><th class="num c-hm">전세 중위</th><th class="num c-hm">전세가율</th><th class="num c-hm">거래</th><th class="num">여의도(지하철)</th><th class="num">필요 현금(대출 외)</th></tr></thead><tbody></tbody></table></div>
+<button class="more" id="candMore"></button>
+<div class="note">여의도(지하철): 여의도역(5·9호선) 도착 기준 지하철·광역철도 대략 시간. 지역 대표역 탑승~도착, 환승 포함, 집→역 도보·배차 대기 제외. 출퇴근 시간대·단지 위치에 따라 달라지므로 단지별로는 지도 앱 길찾기로 확인.</div>
+<div class="note">세대수·지하철/버스 도보시간·주변 학교: 국토교통부 공동주택관리정보(K-apt). 단지명으로 자동 연결해 일부 단지(소규모·이름 불일치)는 정보 없음. 도보시간은 관리사무소 등록 구간값. 세대수·도보 필터를 쓰면 정보 없는 단지는 제외됨.</div>
+<div class="note">같은 단지·같은 동·같은 전용면적 3건 이상 거래 기준. 실거래가이며 현재 매물 호가는 중개사무소·부동산 앱에서 확인. 필요 현금이 빨간색이면 보유 자금보다 큰 경우.</div>
+</section>
+
+<section id="popular">
+<h2>인기 지역 주요 단지 (15억 초과)</h2>
+<div class="note" style="margin:-6px 0 10px">집계: <span id="popAsof"></span>, 같은 단지·전용면적 2건 이상 거래, 12개월 중위가 15억 초과.</div>
+<div class="seg" id="popSeg"></div>
+<div class="filters">
+  <div class="fg"><label>전용면적</label><select id="pSize"><option value="all">전체</option><option value="40-62">59㎡대 이하</option><option value="63-86">84㎡대</option><option value="87-999">85㎡ 초과</option></select></div>
+  <div class="fg"><label>가격대</label><select id="pPrice"><option value="all">전체</option><option value="15-20">15~20억</option><option value="20-25">20~25억</option><option value="25-30">25~30억</option><option value="30-999">30억 초과</option></select></div>
+  <div class="fg"><label>세대수</label><select id="pHH"><option value="0">전체</option><option value="300">300세대 이상</option><option value="500">500세대 이상</option><option value="1000">1,000세대 이상</option></select></div>
+  <div class="fg"><label>지하철역 도보</label><select id="pSub"><option value="0">전체</option><option value="5">5분 이내</option><option value="10">10분 이내</option><option value="15">15분 이내</option></select></div>
+  <div class="fg"><label>정렬</label><select id="pSort"><option value="n">거래 많은 순</option><option value="price">가격 낮은 순</option><option value="built">최신 준공 순</option><option value="last">최근 거래 순</option></select></div>
+</div>
+<div class="note" id="popCount" style="margin:8px 0"></div>
+<div class="tw"><table id="popTbl"><thead><tr><th>단지</th><th>전용</th><th>준공</th><th class="num">최근 거래</th><th class="num">12개월 중위</th><th class="num c-hm">전세 중위</th><th class="num c-hm">거래</th><th class="num">필요 현금(대출 외)</th></tr></thead><tbody></tbody></table></div>
+<button class="more" id="popMore"></button>
+<div class="note">세대수·지하철/버스 도보시간·주변 학교: 국토교통부 공동주택관리정보(K-apt). 단지명으로 자동 연결해 일부 단지(소규모·이름 불일치)는 정보 없음. 도보시간은 관리사무소 등록 구간값. 세대수·도보 필터를 쓰면 정보 없는 단지는 제외됨.</div>
+</section>
+
+
+
+
+
+<section id="marriage">
+<h2>계획 A · 결혼 전 1주택 → 결혼 시 매도</h2>
+<div class="verdict" style="background:var(--navy2)"><div class="lab">판단 요약</div><div class="big" style="font-size:19px">2027~29년 하락을 예상한다면 지금은 무주택 유지 + 후보 추적이 유리. 하락 확인 후 결혼 시점에 따라 경로 선택.</div></div>
+<div class="grid2" style="margin-top:14px">
+  <div class="card"><h3>잃는 것 (매수 시)</h3><ul>
+    <li><b>본인 명의 생애최초 자격 영구 상실</b>: 생애최초 특공·생애최초 LTV 70%·취득세 감면(최대 200만원) 모두 1회성</li>
+    <li><b>단, 우회로 존재</b>: 혼인신고 전에 매도 완료 시 배우자 명의 생애최초 특공 가능(2024년 특례). 신혼부부 특공은 모집공고일 기준 무주택이면 신청 가능</li>
+    <li>보유 중 추가 매수 시 대출 불가(유주택자 LTV 0%)</li>
+  </ul></div>
+  <div class="card"><h3>비용과 위험</h3><ul>
+    <li><b>왕복 거래비용</b>: 취득세·중개보수(양쪽)·이사·등기 합계 집값의 약 3~5%</li>
+    <li><b>양도세</b>: 1세대 1주택 비과세는 2년 보유 필요(규제지역 취득분은 2년 거주도 필요). 미충족 시 단기 양도세 중과</li>
+    <li><b>강제 매도 위험</b>: 결혼 시점에 맞춰 팔아야 해 하락기에 손실 확정 가능</li>
+    <li><b>전망과 상충</b>: 하락을 예상하면서 지금 매수하는 것은 본인 전망과 반대 포지션</li>
+  </ul></div>
+</div>
+<h3>시나리오별 경로</h3>
+<div class="tw"><table><thead><tr><th>상황</th><th>권장 경로</th><th>이유</th></tr></thead><tbody>
+<tr><td>지금 ~ 하락 확인 전</td><td>무주택 유지, 현금 적립, 청약통장 유지, 후보 단지 가격 추적</td><td>모든 선택지(생애최초·신혼특공·갭투자) 보존</td></tr>
+<tr><td>하락 확인 + 결혼까지 2년 이상</td><td>비규제 지역 전세 낀 매수 → 2년 보유 후 혼인신고 전 매도</td><td>양도세 비과세 요건 충족, 배우자 생애최초 보존</td></tr>
+<tr><td>하락 확인 + 결혼이 가까움</td><td>무주택 유지 → 결혼 후 신혼·생애최초 특공, 디딤돌·보금자리론</td><td>거래비용·강제매도 위험 회피, 정책대출 LTV 70%</td></tr>
+<tr><td>결혼 후에도 보유 원할 때</td><td>매도 대신 혼인합가 비과세 특례 활용 검토</td><td>혼인으로 2주택이 돼도 일정 기간 내 1채 매도 시 비과세 (세무사 확인)</td></tr>
+</tbody></table></div>
+</section>
+
+<section id="firstbuy">
+<h2>계획 B · 결혼할 때 생애최초로 매수</h2>
+<div class="verdict" style="background:var(--navy2)"><div class="lab">요약</div><div class="big" style="font-size:19px">결혼 전까지 무주택을 유지하고, 결혼 후 부부 중 한 명 명의로 "생애최초" 혜택(대출 70%·청약·세금 감면)을 써서 실거주 집을 사는 방법.</div></div>
+<div class="grid2" style="margin-top:14px">
+  <div class="card"><h3>얻는 것</h3><ul>
+    <li><b>서울도 대출 70%</b>: 규제지역이어도 생애최초는 LTV 70% (단, 15억 이하 집 대출 최대 6억)</li>
+    <li><b>부부합산 소득</b>으로 DSR 한도가 커짐 → 혼자일 때보다 대출 가능액 증가</li>
+    <li><b>청약 기회</b>: 생애최초 특공, 신혼부부 특공(혼인 7년 이내) 모두 가능</li>
+    <li><b>취득세 감면</b>: 12억 이하 주택 최대 200만원</li>
+    <li><b>정책대출</b>: 디딤돌(신혼 3.2억, 6억 이하 주택), 보금자리론(생애최초 4.2억, 6억 이하) — DSR 미적용</li>
+    <li><b>부모 지원</b>: 혼인 증여공제 1억 + 기본 5천만원 (양가 각각)</li>
+    <li><b>거래 1번</b>: 사고팔기를 반복하지 않아 거래비용 절약</li>
+  </ul></div>
+  <div class="card"><h3>비용과 위험</h3><ul>
+    <li><b>매수 시점이 결혼 후로 밀림</b>: 그 사이 집값이 오르면 그만큼 손해(하락 예상이 틀릴 경우)</li>
+    <li><b>실거주 의무</b>: 생애최초 대출은 6개월 내 전입, 서울은 토지거래허가로 2년 실거주</li>
+    <li><b>소득 요건</b>: 디딤돌(신혼 부부합산 8.5천만원 이하)·특공은 소득 기준이 있어 맞벌이 고소득이면 제외될 수 있음. 은행 생애최초 LTV 70%는 소득 제한 없음</li>
+    <li><b>청약 요건</b>: 생애최초 특공은 5년 이상 소득세 납부 실적 필요</li>
+    <li><b>대출 상한</b>: 70%여도 15억 이하 집은 최대 6억 → 10억 집이면 현금 4억+세금 필요</li>
+    <li><b>한 번만 사용</b>: 생애최초는 평생 1회. 첫 집 선택이 중요</li>
+  </ul></div>
+</div>
+<h3>예시: 서울 10억 아파트를 살 때 필요한 내 돈</h3>
+<div class="tw"><table><thead><tr><th>구분</th><th class="num">대출 가능(최대)</th><th class="num">필요 현금(세금·중개 포함 약)</th></tr></thead><tbody>
+<tr><td>생애최초 (LTV 70%, 상한 6억)</td><td class="num">6억</td><td class="num">약 4.4억</td></tr>
+<tr><td>일반 무주택 (LTV 40%)</td><td class="num">4억</td><td class="num">약 6.4억</td></tr>
+<tr><td>1주택 보유 중 (처분 안 함)</td><td class="num">0원</td><td class="num">약 11억 (2주택 취득세 중과 8%대)</td></tr>
+</tbody></table></div>
+<div class="note">소득이 충분해 DSR 한도가 6억 이상 나온다는 가정. 실제 한도는 위 계산기에서 부부합산 소득으로 확인.</div>
+
+<h3>A vs B 비교</h3>
+<div class="tw"><table><thead><tr><th>항목</th><th>A · 결혼 전 1주택 → 매도</th><th>B · 결혼 후 생애최초 매수</th></tr></thead><tbody>
+<tr><td>언제 사나</td><td>결혼 2년 이상 전 (하락기)</td><td>결혼 후 (하락기면 바로)</td></tr>
+<tr><td>어디를 사나</td><td>주로 비규제 지역 전세 낀 집 (투자용)</td><td>서울 포함 실거주할 집</td></tr>
+<tr><td>대출</td><td>전세 승계라 대출 거의 없음</td><td>생애최초 LTV 70% (상한 6억), 부부합산 소득</td></tr>
+<tr><td>필요 현금</td><td>갭 + 세금 (약 1억 안팎)</td><td>집값 − 대출 + 세금 (10억 집이면 약 4.4억)</td></tr>
+<tr><td>생애최초 자격</td><td>본인 소멸. 혼인신고 전 매도 시 배우자 명의로 사용 가능</td><td>그대로 사용</td></tr>
+<tr><td>청약</td><td>혼인 전 매도 완료 시 신혼·배우자 생애최초 가능</td><td>신혼·생애최초 모두 가능</td></tr>
+<tr><td>거래비용</td><td>사고팔기 2번 (집값 3~5%)</td><td>사기 1번</td></tr>
+<tr><td>세금 조건</td><td>2년 보유해야 양도세 비과세</td><td>해당 없음 (보유 중)</td></tr>
+<tr><td>주요 위험</td><td>결혼 시점에 맞춘 강제 매도, 역전세</td><td>기다리는 동안 집값 상승</td></tr>
+<tr><td>잘 맞는 경우</td><td>결혼이 2년 이상 남았고, 하락이 확인된 경우</td><td>결혼이 가깝거나, 실거주할 좋은 집 1채가 목표인 경우</td></tr>
+</tbody></table></div>
+<div class="note">A로 번 차익을 B의 자금으로 쓰는 "A → B 연결"도 가능: 결혼 전 투자 → 혼인신고 전 매도 → 배우자 명의 생애최초로 실거주 매수. 위 "나의 현실적인 순서"의 경로 A가 이 방식.</div>
+</section>
+
+<section id="basics">
+<h2>처음 사는 사람이 알아야 할 것</h2>
+<h3>매수 절차</h3>
+<ol class="steps">
+<li><b>자금 계획</b> — 위 계산기로 한도 확인 후 은행 2~3곳 사전 상담(실제 한도는 신용·소득 서류 기준으로 달라짐)</li>
+<li><b>임장·단지 선정</b> — 실거래가·전세가·학군·교통·세대수 비교. 호가가 아닌 실거래 기준</li>
+<li><b>토지거래허가 신청 (규제지역)</b> — 계약 전 구청 허가 필요, 처리 약 2주. 자금조달계획서 제출</li>
+<li><b>매매계약</b> — 계약금 통상 10%. 등기부등본(근저당·압류) 계약 당일 재확인</li>
+<li><b>대출 실행·잔금</b> — 잔금일에 대출 실행, 소유권 이전 등기. 취득세는 잔금 후 60일 내 납부</li>
+<li><b>입주·전입</b> — 규제지역은 허가 후 4개월 내 입주, 2년 실거주. 생애최초 대출은 6개월 내 전입</li>
+</ol>
+<h3>항목별 설명</h3>
+<details><summary>LTV · DSR · 스트레스 DSR이 뭔가요</summary><div class="body">
+<b>LTV</b>: 집값 대비 대출 비율. 5억 집, LTV 40%면 최대 2억.<br>
+<b>DSR</b>: 연소득 대비 모든 대출의 연간 원리금 비율. 은행은 40% 이하.<br>
+<b>스트레스 DSR</b>: 금리 상승에 대비해 실제 금리보다 높은 가상 금리로 DSR을 계산. 수도권 주담대는 +3.0%p를 금리 유형별 비율만큼 더함(변동형은 전부, 주기형은 일부).<br>
+최종 한도는 <b>LTV 한도 · DSR 한도 · 금액 상한(15억 이하 6억)</b> 중 가장 작은 값.
+</div></details>
+<details><summary>상환 방법 차이 (원리금균등 · 원금균등 · 만기일시)</summary><div class="body">
+<b>원리금균등</b>: 매달 같은 금액. 초반엔 이자 비중이 큼. 가계 계획 세우기 쉬움.<br>
+<b>원금균등</b>: 원금을 매달 똑같이 갚아 첫 달 부담이 가장 크고 점점 줄어듦. 총이자는 원리금균등보다 적음.<br>
+<b>만기일시</b>: 매달 이자만 내고 만기에 원금 전액 상환. 월 부담은 작지만 만기 목돈 필요. 은행 주담대는 원칙적으로 분할상환이라 주로 사내대출·신용대출에서 사용.
+</div></details>
+<details><summary>토지거래허가구역과 실거주 의무</summary><div class="body">
+서울 전역 아파트는 허가 후 4개월 내 입주, 2년 실거주 의무. 전세 낀 매수(갭투자) 원칙적 불가.<br>
+예외: 2026-05-12 이후 계속 무주택인 사람이 세입자 있는 집을 사면 임대차 종료(갱신 포함)까지 입주 유예, 신청 기한 2027-12-31, 최종 입주는 2029년까지.
+</div></details>
+<details><summary>비용: 취득세 · 중개보수 · 보유세</summary><div class="body">
+<b>취득세</b>(1주택, 85㎡ 이하): 6억 이하 1.1%, 6~9억 1.1~3.3% 구간 비례, 9억 초과 3.3%. 2주택(조정지역)은 8%대 중과.<br>
+<b>중개보수</b>: 2억~9억 0.4%, 9억~12억 0.5% 상한(협의 가능).<br>
+<b>보유세</b>: 매년 6월 1일 소유자에게 재산세(7·9월), 공시가 높으면 종부세(12월). 59㎡ 5억대는 연 수십만원 수준.
+</div></details>
+<details><summary>양도세 비과세 (1세대 1주택)</summary><div class="body">
+2년 이상 보유 시 12억까지 비과세. 규제지역(조정대상지역)에서 취득했다면 2년 거주도 필요. 2년 미만 보유 매도는 단기 양도세율(60~70%) 적용.
+</div></details>
+<details><summary>전세 낀 매수의 위험 (갭투자)</summary><div class="body">
+전세 만기 때 집값·전셋값이 내려가면 보증금 차액을 내가 돌려줘야 함(역전세). 현금 여유가 없으면 대출 불가 상황에서 위험. 전세가율(전세가÷매매가)이 지나치게 높은 단지는 하락기 위험이 큼.
+</div></details>
+<details><summary>대출 관련 함정</summary><div class="body">
+신용대출 1억 초과 보유자는 1년간 규제지역 주택 구입 제한. 미사용 마이너스통장도 한도 전액이 DSR에 반영. 자금조달계획서에 적은 자금 출처는 증빙 필요(가족 차용 시 차용증·이자 이체 내역).
+</div></details>
+<details><summary>청약 특별공급 자격 (무주택의 가치)</summary><div class="body">
+<b>생애최초 특공</b>: 세대원 전원이 과거 주택 소유 이력 없어야 함, 5년 이상 소득세 납부.<br>
+<b>신혼부부 특공</b>: 혼인 7년 이내, 모집공고일 기준 무주택 세대구성원. 혼인 전 당첨·소유 이력은 일부 배제 특례(2024).<br>
+분양가 상한제 단지는 시세보다 낮게 공급되어 시세차익 기대. 현금 1억은 계약금으로 활용 가능.
+</div></details>
+</section>
+
+<section id="policy">
+<h2>정책대출 · 한도 외 추가 자금</h2>
+<div class="grid2">
+<div><h3>정책대출 (DSR 미적용)</h3>
+<div class="tw"><table><thead><tr><th>상품</th><th>주택가격</th><th>LTV</th><th>최대 한도</th></tr></thead><tbody>
+<tr><td>디딤돌대출</td><td>5억 이하 (신혼·2자녀 6억)</td><td>70%</td><td>일반 2억 · 생애최초 2.4억 · 신혼 3.2억 · 신생아 4억</td></tr>
+<tr><td>보금자리론</td><td>6억 이하</td><td>규제지역 일반 60% / 생애최초·실수요 70%</td><td>일반 3.6억 · 생애최초 4.2억</td></tr>
+</tbody></table></div>
+<div class="note">소득 요건(디딤돌): 일반 연 6천만원, 생애최초 7천만원, 신혼 8.5천만원 이하 등. 순자산 요건 별도. 신청 전 주택도시기금 사이트에서 확인.</div>
+</div>
+<div><h3>주담대 한도 밖 자금</h3>
+<div class="tw"><table><thead><tr><th>수단</th><th>DSR</th><th>핵심 유의사항</th></tr></thead><tbody>
+<tr><td>퇴직연금 DC·IRP 중도인출</td><td>미반영</td><td>무주택자 본인 명의 구입 시. 퇴직소득세 원천징수 후 수령</td></tr>
+<tr><td>사내대출·복지기금</td><td>통상 미반영</td><td>은행 협약 보증형이면 DSR 포함. 근저당 설정 시 은행과 경합</td></tr>
+<tr><td>보험약관·예적금담보</td><td>미반영</td><td>잔금 직전 단기 부족분 보완용</td></tr>
+<tr><td>부모 증여·차용</td><td>미반영</td><td>증여공제 10년 5천만원 + 혼인·출산 1억. 차용은 차용증·이자 이체 필수</td></tr>
+</tbody></table></div></div>
+</div>
+</section>
+
+</div>
+<footer>출처: 금융위원회·국토교통부 10·15 주택시장 안정화 대책 및 FAQ, 2026-07 규제지역 추가 지정, 2026-09 토허구역 실거주 유예 연장 발표, 국토교통부 실거래가 OpenAPI. 본 도구는 판단 보조용 추정치이며, 실제 대출 한도는 은행 심사, 세금은 세무사 확인 필요.</footer>
+
+<script>
+(async function(){
+// collapsible sections (default closed, except 결론)
+document.querySelectorAll('section').forEach(s=>{if(s.id==='calc')return;const h=s.querySelector('h2');if(!h)return;s.classList.add('collapsible');h.classList.add('sec-h');
+  const body=document.createElement('div');body.className='sbody';while(h.nextSibling)body.appendChild(h.nextSibling);s.appendChild(body);h.addEventListener('click',()=>s.classList.toggle('open'))});
+document.querySelectorAll('nav a').forEach(a=>a.addEventListener('click',()=>{const t=document.querySelector(a.getAttribute('href'));if(t){const s=t.closest('section');if(s)s.classList.add('open')}}));
+let DATA={seoul:[],gg:[],sc:[],gc:[]},RULES={params:{},notices:[]};
+try{[DATA,RULES]=await Promise.all([fetch("data.json",{cache:"no-store"}).then(r=>r.json()),fetch("rules.json",{cache:"no-store"}).then(r=>r.json())])}catch(e){}
+const COM={"서울 종로": [15, "광화문역 5호선 직통"], "서울 중구": [12, "충정로역 5호선 직통"], "서울 용산": [15, "용산역 1호선→신길역 5호선 환승"], "서울 성동": [25, "왕십리역 5호선 직통"], "서울 광진": [30, "군자역 5호선 직통"], "서울 동대문": [35, "청량리역 1호선→신길역 5호선 환승"], "서울 중랑": [45, "상봉역 7호선→고속터미널역 9호선 급행"], "서울 성북": [35, "성신여대입구역 4호선→동작역 9호선"], "서울 강북": [45, "수유역 4호선→동작역 9호선"], "서울 도봉": [50, "창동역 4호선→동작역 9호선"], "서울 노원": [55, "노원역 4호선→동작역 9호선"], "서울 은평": [35, "연신내역 6호선→공덕역 5호선"], "서울 서대문": [12, "서대문역 5호선 직통"], "서울 마포": [6, "공덕역 5호선 직통"], "서울 양천": [15, "목동역 5호선 직통"], "서울 강서": [25, "발산역 5호선 직통"], "서울 구로": [15, "신도림역 2호선→영등포구청역 5호선"], "서울 금천": [20, "가산디지털단지역 1호선→신길역 5호선"], "서울 영등포": [6, "영등포구청역 5호선 직통"], "서울 동작": [6, "노량진역 9호선 직통"], "서울 관악": [15, "신림역 신림선→샛강역(여의도)"], "서울 서초": [10, "고속터미널역 9호선 급행"], "서울 강남": [15, "신논현역 9호선 급행"], "서울 송파": [25, "석촌역 9호선 급행"], "서울 강동": [40, "천호역 5호선 직통"], "광명": [30, "철산역 7호선→대림역 2호선→영등포구청역 5호선"], "하남": [60, "하남검단산역 5호선 직통"], "과천": [30, "과천역 4호선→동작역 9호선"], "안양 동안": [40, "범계역 4호선→금정역 1호선→신길역 5호선"], "성남 수정": [55, "산성역 8호선→잠실역 9호선(종합운동장)"], "성남 중원": [55, "모란역 8호선→잠실역 9호선(종합운동장)"], "성남 분당": [35, "정자역 신분당선→신논현역 9호선 급행"], "의왕": [40, "의왕역 1호선→신길역 5호선"], "용인 수지": [45, "수지구청역 신분당선→신논현역 9호선 급행"], "용인 기흥": [65, "기흥역 수인분당선·신분당선→신논현역 9호선"], "수원 장안": [50, "성균관대역 1호선→신길역 5호선"], "수원 영통": [70, "영통역 수인분당선→신분당선→9호선"], "수원 팔달": [45, "수원역 1호선 급행→신길역 5호선"], "구리": [55, "구리역 경의중앙선→용산역 1호선→신길역 5호선"], "부천 원미": [30, "부천역 1호선 급행→신길역 5호선"], "부천 소사": [25, "소사역 1호선→신길역 5호선"], "부천 오정": [35, "원종역 서해선→김포공항역 9호선 급행"], "안양 만안": [30, "안양역 1호선→신길역 5호선"], "군포": [35, "금정역 1호선→신길역 5호선"], "고양 덕양": [30, "대곡역 서해선→김포공항역 9호선 급행"], "고양 일산동": [40, "백석역 3호선→대곡역 서해선→김포공항역 9호선"], "고양 일산서": [40, "일산역 서해선→김포공항역 9호선 급행"], "김포": [40, "걸포북변역 김포골드라인→김포공항역 9호선 급행"], "인천 부평": [40, "부평역 1호선 급행→신길역 5호선"], "인천 계양": [30, "계양역 공항철도→김포공항역 9호선 급행"], "인천 서구": [35, "검암역 공항철도→김포공항역 9호선 급행"], "인천 연수(송도)": [70, "인천대입구역 인천1호선→부평역 1호선→신길역 5호선"], "인천 미추홀": [45, "주안역 1호선→신길역 5호선"], "인천 남동": [50, "인천시청역 인천1호선→부평역 1호선→신길역 5호선"], "시흥": [40, "시흥대야역 서해선→소사역 1호선→신길역 5호선"], "수원 권선": [50, "수원역 1호선 급행→신길역 5호선"], "의정부": [60, "의정부역 1호선→서울역→공덕역 5호선"], "남양주": [55, "도농역 경의중앙선→용산역 1호선→신길역 5호선"], "파주": [45, "운정역 경의중앙선→공덕역 5호선"]};
+const comKey=a=>COM[a]?a:(COM['서울 '+a]?'서울 '+a:a);
+const comMin=a=>(COM[comKey(a)]||[999])[0];
+const comRoute=a=>(COM[comKey(a)]||[0,''])[1];
+['areas','summary','cands'].forEach(k=>(DATA[k]||[]).forEach(x=>{if(COM[comKey(x.area)])x.commute=comMin(x.area)}));
+
+let KAPT={};try{KAPT=(await fetch('kapt.json',{cache:'no-store'}).then(r=>r.json())).map||{}}catch(e){}
+const K=x=>KAPT[x.dong+'|'+x.apt];
+function addK(td,x){const k=K(x);if(!k)return;const parts=[];if(k.hh)parts.push(k.hh.toLocaleString()+'세대');
+  const st=k.sub?k.sub.split(',')[0].trim()+'역':null;const sub=(st||k.line)?('지하철 '+(st||'')+(k.line?'('+k.line.replace(/\s/g,'')+')':'')+(k.subT?' '+k.subT.replace('이내',' 이내'):'')):(k.subT?'지하철 '+k.subT.replace('이내',' 이내'):null);
+  if(sub)parts.push(sub);if(k.busT)parts.push('버스 '+k.busT.replace('이내',' 이내'));
+  if(parts.length)td.append(el('div',{class:'kinfo'},parts.join(' · ')));if(k.edu){const ed=k.edu.replace(/[가-힣]+\(\s*\)\s*/g,'').trim();if(ed)td.append(el('div',{class:'kinfo edu'},ed))}}
+function kPass(x,hh,sub){if(+hh===0&&+sub===0)return true;const k=K(x);if(!k)return false;if(+hh&&!(k.hh>=+hh))return false;if(+sub&&!(k.subMax!=null&&k.subMax<=+sub))return false;return true}
+const P=Object.assign({ltv_reg_general:.4,ltv_reg_first:.7,ltv_reg_seomin:.6,seomin_income:9000,seomin_price:80000,ltv_nonreg:.7,cap_15:60000,cap_25:40000,cap_over:20000,stress_capital:.03,dsr_bank:.4},RULES.params||{});
+const $=id=>document.getElementById(id);
+const F=v=>Math.round(v).toLocaleString();
+const E=v=>{const a=Math.abs(v);return (v<0?'−':'')+(a>=10000?(a/10000).toFixed(a>=100000?1:2).replace(/\.?0+$/,'')+'억':Math.round(a).toLocaleString()+'만')};
+const ids=['marry','outlook','save','price','region','mode','jeonse','own','income','rate','term','rtype','lmeth','credit','cash','dc','corp','crate','cterm','cmeth','ins','family'];
+const NOW=new Date().getFullYear();{const m=document.getElementById('marry');for(let y=NOW+1;y<=NOW+10;y++){const o=document.createElement('option');o.value=y;o.textContent=y+'년';m.append(o)}m.value=String(NOW+3)}
+try{const s=JSON.parse(localStorage.getItem('premcalc')||'{}');ids.forEach(i=>{if(s[i]!=null)$(i).value=s[i]})}catch(e){}
+function el(t,a,x){const e=document.createElement(t);if(a)for(const k in a)e.setAttribute(k,a[k]);if(x!=null)e.textContent=x;return e}
+function pv(r,n,pmt){return r===0?pmt*n:pmt*(1-Math.pow(1+r,-n))/r}
+function pmt(r,n,p){return r===0?p/n:p*r/(1-Math.pow(1+r,-n))}
+function payFirst(meth,rate,years,P){const r=rate/100/12,n=Math.max(1,years*12);if(!P)return 0;if(meth==='prin')return P/n+P*r;if(meth==='bullet')return P*r;return pmt(r,n,P)}
+function payLast(meth,rate,years,P){const r=rate/100/12,n=Math.max(1,years*12);if(!P)return 0;if(meth==='prin')return P/n+(P/n)*r;if(meth==='bullet')return P*r+P;return pmt(r,n,P)}
+function totalInt(meth,rate,years,P){const r=rate/100/12,n=Math.max(1,years*12);if(!P)return 0;if(meth==='prin')return P*r*(n+1)/2;if(meth==='bullet')return P*r*n;return pmt(r,n,P)*n-P}
+function acqTax(p,first){let r;if(p<=60000)r=0.011;else if(p<=90000)r=((p/10000)*2/3-3)/100*1.1;else r=0.033;let t=p*r;if(first&&p<=120000)t=Math.max(0,t-200);return t}
+function brok(p){const r=p<20000?0.005:p<90000?0.004:p<120000?0.005:p<150000?0.006:0.007;return p*r}
+
+function compute(v,priceOverride){
+  const p=priceOverride??v.price;
+  const reg=v.region==='reg', first=v.own==='none';
+  const owner=v.own==='keep';
+  const cap=p<=150000?P.cap_15:p<=250000?P.cap_25:P.cap_over;
+  let ltv,ltvName;
+  if(owner){ltv=0;ltvName='1주택 보유(대출 불가)'}
+  else if(reg){
+    const seomin=v.income<=P.seomin_income&&p<=P.seomin_price&&v.own!=='one';
+    if(first){ltv=P.ltv_reg_first;ltvName='생애최초 '+Math.round(ltv*100)+'%'}else if(seomin){ltv=P.ltv_reg_seomin;ltvName='서민·실수요자 '+Math.round(ltv*100)+'%'}else{ltv=P.ltv_reg_general;ltvName='일반 '+Math.round(ltv*100)+'%'}
+  }else{ltv=P.ltv_nonreg;ltvName=(first?'생애최초 ':'비규제 ')+Math.round(ltv*100)+'%'}
+  const ltvAmt=p*ltv;
+  const ratio=v.rtype==='var'?1:v.rtype==='mix'?.8:.4;
+  const sRate=v.rate/100+P.stress_capital*ratio;
+  const annual=v.income*P.dsr_bank;
+  const creditPay=v.credit>0?v.credit/5+v.credit*.05:0;
+  const avail=Math.max(0,annual-creditPay);
+  const dsrAmt=pv(sRate/12,v.term*12,avail/12);
+  let loan=Math.min(cap,ltvAmt,dsrAmt);
+  let bind=loan===cap?'금액 상한':loan===ltvAmt?'LTV':'DSR(소득)';
+  const gap=v.mode==='gap';
+  if(gap){loan=0;bind='전세 승계(주담대 미사용)'}
+  const tax=acqTax(p,first), fee=brok(p), etc=p*.003;
+  const need=p+tax+fee+etc;
+  const extra=v.dc+v.corp+v.ins+v.family;
+  const have=v.cash+extra+loan+(gap?v.jeonse:0);
+  return {p,cap,ltv,ltvName,ltvAmt,ratio,sRate,annual,creditPay,avail,dsrAmt,loan,bind,tax,fee,etc,need,extra,have,diff:have-need,monthly:payFirst(v.lmeth,v.rate,v.term,loan),corpM:payFirst(v.cmeth,v.crate,v.cterm,v.corp),gap,reg,first,owner};
+}
+function maxPrice(v){let lo=0,hi=400000;
+  if(v.mode==='gap'){ // jeonse fixed proportion of price
+    const ratio=v.jeonse/v.price;let l=0,h=400000;for(let i=0;i<40;i++){const m=(l+h)/2;const r=compute({...v,jeonse:m*ratio},m);if(r.diff>=0)l=m;else h=m}return l}
+  for(let i=0;i<40;i++){const m=(lo+hi)/2;if(compute(v,m).diff>=0)lo=m;else hi=m}return lo}
+
+function render(){
+  const v={};ids.forEach(i=>{const x=$(i);v[i]=x.tagName==='SELECT'?x.value:(parseFloat(x.value)||0)});
+  try{localStorage.setItem('premcalc',JSON.stringify(v))}catch(e){}
+  $('jeonseBox').style.display=v.mode==='gap'?'':'none';
+  $('priceHint').textContent='= '+E(v.price);
+  const r=compute(v);const mp=maxPrice(v);
+  // verdict
+  const vd=$('verdict');vd.className='verdict '+(r.diff>=0?'ok':'no');vd.textContent='';
+  vd.append(el('div',{class:'lab'},'결론'));
+  vd.append(el('div',{class:'big'},r.diff>=0?`매수 가능 · 여유 ${E(r.diff)}`:`자금 부족 · ${E(-r.diff)} 더 필요`));
+  const ul=el('ul');
+  ul.append(el('li',null,`지금 조건으로 살 수 있는 최대 가격: 약 ${E(mp)}`));
+  if(!r.gap)ul.append(el('li',null,`은행 대출 가능액 ${E(r.loan)} (${r.bind} 때문에 이 금액에서 막힘) · 매달 갚을 돈 약 ${E(r.monthly+r.corpM)}${v.corp?' (사내대출 포함)':''}${v.lmeth==='prin'||v.cmeth==='prin'?', 첫 달 기준':''}`));
+  else ul.append(el('li',null,`전세 ${E(v.jeonse)} 승계 · 실투자금(갭+부대비용) ${E(r.need-v.jeonse)}`));
+  if(r.reg&&r.gap)ul.append(el('li',null,'규제지역 전세 낀 매수: 2026-05-12 이후 계속 무주택인 경우에만 가능, 임대차 종료 후 2년 실거주(최종 입주 2029년)'));
+  else if(r.reg)ul.append(el('li',null,'규제지역: 허가 후 4개월 내 입주, 2년 실거주 의무'));
+  else ul.append(el('li',null,'비규제 지역: 실거주 의무 없음, 전세 낀 매수 가능'));
+  vd.append(ul);
+  // kpis
+  const k=$('kpis');k.textContent='';
+  [['총 필요자금',E(r.need),'매수가+취득세+중개+기타'],['조달 가능 자금',E(r.have),r.gap?'현금+추가자금+전세':'현금+추가자금+주담대'],['과부족',(r.diff>=0?'+':'')+E(r.diff),'조달 − 필요'],
+   ['주담대 한도',E(r.loan),r.gap?'미사용':r.bind+' 기준'],['월 상환액',E((r.gap?0:r.monthly)+r.corpM),`월소득 대비 ${(((r.gap?0:r.monthly)+r.corpM)/(v.income/12)*100||0).toFixed(0)}%`+(v.lmeth==='prin'||v.cmeth==='prin'?' · 첫 달':'')],['최대 매수가',E(mp),'현 조건 역산']]
+   .forEach(([l,x,n],i)=>{const d=el('div',{class:'kpi'});const vv=el('div',{class:'v'+(i===2?(r.diff>=0?' pos':' neg'):'')},x);d.append(el('div',{class:'l'},l),vv,el('div',{class:'n'},n));k.append(d)});
+  // flags
+  const fl=$('flags');fl.textContent='';
+  const add=(t,c)=>fl.append(el('div',{class:'flag'+(c?' '+c:'')},t));
+  if(v.credit>10000&&r.reg)add('신용대출 1억 초과 보유 시 1년간 규제지역 주택 구입 제한');
+  if(r.first&&!r.gap)add('생애최초 LTV 적용 시 6개월 내 전입 의무. 한 번 매수하면 본인 생애최초 자격 소멸','info');
+  if(r.owner)add('1주택을 계속 보유하면 수도권 주담대 불가(LTV 0%). 처분 조건부로 바꾸면 40%');
+  if(!r.gap&&v.price<=60000&&!r.owner){const lim=r.first?24000:20000;if((r.first&&v.income<=7000)||(!r.first&&v.income<=6000))add(`디딤돌대출 소득요건 충족 가능 → 한도 ${E(lim)}, DSR 미적용 (주택가격 5억 이하 조건)`,'info')}
+  if(r.gap)add('전세 낀 매수는 만기 때 전셋값이 내려가면 차액을 돌려줘야 함(역전세). 여유 현금 확보 필요');
+  // loan table
+  const lt=$('loanTbl');lt.textContent='';
+  const row=(a,b,c,bold)=>{const tr=el('tr',bold?{class:'sum'}:null);tr.append(el('td',null,a),el('td',null,b),el('td',{class:'num'},c));lt.append(tr)};
+  row('① 금액 상한','15억 이하 6억 / 25억 이하 4억 / 초과 2억',E(r.cap));
+  row('② LTV',`${E(r.p)} × ${r.ltvName}`,E(r.ltvAmt));
+  row('③ 스트레스 DSR',`연소득 40%(${E(r.annual)}) − 기존 신용대출 상환(${E(r.creditPay)}), 심사금리 ${(r.sRate*100).toFixed(2)}% (실제 ${v.rate}% + 3.0%p×${Math.round(r.ratio*100)}%), ${v.term}년`,E(r.dsrAmt));
+  row('최종 주담대 한도',r.gap?'전세 승계 매수는 주담대 미사용':'①②③ 중 최소 → '+r.bind,E(r.loan),true);
+  const mName={eq:'원리금균등',prin:'원금균등',bullet:'만기일시'};
+  if(!r.gap&&r.loan)row('주담대 상환',`${mName[v.lmeth]} · ${v.rate}% · ${v.term}년 → 첫 달 ${E(payFirst(v.lmeth,v.rate,v.term,r.loan))}, 마지막 달 ${E(payLast(v.lmeth,v.rate,v.term,r.loan))}, 총이자 ${E(totalInt(v.lmeth,v.rate,v.term,r.loan))}`,E(payFirst(v.lmeth,v.rate,v.term,r.loan))+'/월');
+  if(v.corp)row('사내대출 상환',`${mName[v.cmeth]} · ${v.crate}% · ${v.cterm}년 → 첫 달 ${E(r.corpM)}, `+(v.cmeth==='bullet'?`만기에 원금 ${E(v.corp)} 일시상환`:`마지막 달 ${E(payLast(v.cmeth,v.crate,v.cterm,v.corp))}`)+`, 총이자 ${E(totalInt(v.cmeth,v.crate,v.cterm,v.corp))}. 은행 DSR에는 미포함(회사 자체 재원 기준)`,E(r.corpM)+'/월');
+  // need/have
+  const nt=$('needTbl');nt.textContent='';
+  [['매수 가격',r.p],['취득세'+(r.first&&r.p<=120000?' (생애최초 감면 반영)':''),r.tax],['중개보수',r.fee],['법무·등기·이사 등',r.etc]].forEach(([a,b])=>{const tr=el('tr');tr.append(el('td',null,a),el('td',{class:'num'},E(b)));nt.append(tr)});
+  {const tr=el('tr',{class:'sum'});tr.append(el('td',null,'합계'),el('td',{class:'num'},E(r.need)));nt.append(tr)}
+  const ht=$('haveTbl');ht.textContent='';
+  const hv=[['보유 현금',v.cash],['퇴직연금 중도인출',v.dc],['사내대출',v.corp],['약관·예적금담보',v.ins],['가족 증여·차용',v.family]];
+  if(r.gap)hv.push(['전세보증금 승계',v.jeonse]);else hv.push(['주담대',r.loan]);
+  hv.forEach(([a,b])=>{const tr=el('tr');tr.append(el('td',null,a),el('td',{class:'num'},E(b)));ht.append(tr)});
+  {const tr=el('tr',{class:'sum'});tr.append(el('td',null,'합계'),el('td',{class:'num'},E(r.have)));ht.append(tr)}
+  roadmap(v,r);
+  window._V=v;if(window.drawCands)window.drawCands();if(window.drawPop)window.drawPop();
+}
+
+function roadmap(v,r){
+  const box=$('roadBox');box.textContent='';
+  const M=parseInt(v.marry)||0, save=v.save*12;
+  const start=v.outlook==='down'?2028:v.outlook==='flat'?NOW+1:NOW;
+  const cashAt=y=>v.cash+v.dc+v.family+save*Math.max(0,y-NOW);
+  // cheapest realistic gap among non-regulated candidates (ratio<80)
+  const cands=(DATA.cands||[]).filter(x=>x.type==='gg_non'&&x.size===59&&x.gap!=null&&x.ratio<80&&x.commute<=50&&x.built>=2010).sort((a,b)=>a.gap-b.gap);
+  const pick=cands[0];
+  const gapNeed=pick?Math.round((pick.gap*10000+pick.med*10000*0.018)):null;
+  const gapNeedF=gapNeed??11000;
+  const steps=[];
+  const add=(when,title,desc,okFlag)=>steps.push({when,title,desc,okFlag});
+  let path;
+  if(M&&M-start>=2) path='A';
+  else if(M) path='B';
+  else path='U';
+  if(path!=='B')add(`지금 ~ ${start-1}년`,'무주택 유지 · 현금 모으기 · 청약통장 유지',`매달 ${E(v.save)} 저축 시 ${start}년 초 예상 자금 ${E(cashAt(start))} (현금+퇴직연금+가족자금 포함). 청약통장은 납입 기간이 점수가 되므로 끊지 않기. 사직2·후보 단지 가격 추적.`);
+  if(path==='A'){
+    add(`${start}년`,'하락 확인되면 비규제 지역 전세 낀 59㎡ 매수',(pick?`예: ${pick.apt}(${pick.area}) 갭 ${pick.gap}억 + 세금·중개 ≈ 필요 현금 ${E(gapNeed)}.`:`비규제 지역 갭 1억 안팎 단지 기준 필요 현금 약 ${E(gapNeedF)} (단지 목록은 [15억 언더] 페이지 참고).`)+` 예상 보유 자금 ${E(cashAt(start))} → `+(cashAt(start)>=gapNeedF?'가능':'부족'),cashAt(start)>=gapNeedF);
+    add(`${start} ~ ${M-1}년`,'2년 이상 보유 (양도세 비과세 조건)','전세 만기 때 전셋값이 내려가면 차액을 돌려줄 현금(수천만원) 따로 확보. 계속 저축.');
+    add(`${M}년 (혼인신고 전)`,'매도 완료','혼인신고 전에 팔면 배우자 명의 생애최초 청약 자격 유지(2024년 특례). 2년 보유했으면 양도세 비과세(12억 이하).');
+    add(`${M}년 이후`,'부부 자금 합쳐 서울 실거주 매수 또는 신혼부부 청약',`예상 자금: 매도 차익 + ${E(cashAt(M))} + 배우자 자금. 배우자 명의 생애최초면 서울도 대출 70%까지. 매수 후 2년 실거주.`);
+  }else if(path==='B'){
+    add(`지금 ~ ${M}년`,'결혼 전에는 사지 않고 무주택 유지 · 저축 · 청약통장 유지',`결혼까지 ${M-NOW}년. 사서 2년 보유하기 전에 결혼하면 세금·거래비용 손해가 커서 무주택 유지가 유리. 매달 ${E(v.save)} 저축 시 ${M}년 예상 자금 ${E(cashAt(M))}. 사직2·후보 단지 가격 추적.`);
+    add(`${M}년`,'혼인신고 → 신혼부부·생애최초 청약 도전','분양가 상한제 단지 우선. 계약금(분양가 10~20%)은 모은 현금으로. 부모 지원 시 혼인 증여공제 1억(양가 각각) 활용 가능.');
+    add(`${M}년 이후`,'하락기면 생애최초로 서울 실거주 매수',`부부합산 소득으로 위 계산기 다시 계산(연소득 칸에 합산 입력). 예상 자금 ${E(cashAt(M))} + 배우자 자금. 생애최초는 서울도 대출 70%, 6개월 내 전입.`);
+    add('매수 후 2년','실거주 후 갈아타기 판단','토지거래허가 실거주 2년 + 양도세 비과세 2년 거주 요건 동시 충족.');
+  }else{
+    add(`${start}년`,'결혼 시점에 따라 갈림','결혼이 '+(start+2)+'년 이후면 → 비규제 지역 전세 낀 매수(2년 보유 후 혼인신고 전 매도). 그 전이면 → 무주택 유지 후 결혼하고 생애최초·신혼 청약. 결혼 예상 연도를 선택하면 순서가 구체화됩니다.');
+  }
+  if(v.outlook==='up')add('참고','상승 예상이라면','기다리는 동안 집값이 오르면 손해. 생애최초로 지금 실거주 매수(서울 대출 70%)를 계산기로 먼저 확인.');
+  const tagTxt={A:'경로 A · 결혼 전 투자 후 혼인신고 전 매도',B:'경로 B · 결혼 후 부부 합산 매수',U:'결혼 시점 미정 · 두 경로 비교'}[path];
+  box.append(el('div',{class:'pathtag'},tagTxt));
+  const ol=el('ol',{class:'road'});
+  steps.forEach(s=>{const li=el('li');li.append(el('div',{class:'when'},s.when));const w=el('div',{class:'what'});const b=el('b',null,s.title);if(s.okFlag!==undefined){b.append(el('span',{class:s.okFlag?'ok':'ng'},s.okFlag?'  ✓ 자금 충분':'  ✗ 자금 부족'))}w.append(b,el('span',null,s.desc));li.append(w);ol.append(li)});
+  box.append(ol);
+}
+ids.forEach(i=>{$(i).addEventListener('input',render);$(i).addEventListener('change',render)});
+render();
+// premium candidates
+$('asof').textContent=DATA.asof||'';$('popAsof').textContent=DATA.popAsof||'';
+const ok=x=>x==null?'—':x+'억';
+const inRange=(x,r)=>{if(r==='all')return true;const[a,b]=r.split('-').map(Number);return x>=a&&x<=b};
+const inPrice=(x,r)=>{if(r==='all')return true;const[a,b]=r.split('-').map(Number);return x>a&&x<=b};
+function needCell(price){const v=window._V;if(!v)return el('td',{class:'num'},'—');const r=compute({...v,mode:'live',region:'reg'},price*10000);return el('td',{class:'num'+(r.diff<0?' neg':'')},E(r.need-r.loan))}
+let aAll=false;
+function drawAreas(){const tb=document.querySelector('#areaTbl tbody');tb.textContent='';const L=[...(DATA.summary||[])].sort((a,b)=>b.share-a.share);
+  (aAll?L:L.slice(0,12)).forEach(a=>{const tr=el('tr');{const td=el('td');td.append(el('div',null,a.area),el('div',{class:'route',style:'margin-left:0'},comRoute(a.area)));tr.append(td)}tr.append(el('td',{class:'num'},'약 '+a.commute+'분'),el('td',{class:'num c-hm'},a.n+'건'),el('td',{class:'num'},a.hi+'건'),el('td',{class:'num'},a.share+'%'),el('td',{class:'num'},ok(a.himed)));tb.append(tr)});
+  const mb=$('areaMore');mb.style.display=L.length>12?'':'none';mb.textContent=aAll?'접기':`전체 ${L.length}개 지역 보기`}
+$('areaMore').onclick=()=>{aAll=!aAll;drawAreas()};drawAreas();
+{const fa=$('fArea');[...new Set((DATA.cands||[]).map(c=>c.area))].sort().forEach(a=>fa.append(el('option',{value:a},a)))}
+let shown=20;const fids=['fPrice','fArea','fSize','fBuilt','fCom','fHH','fSub','fSort'];
+function nameCell(x,sub){const td=el('td');td.append(el('b',null,x.apt),el('div',{class:'note',style:'margin:0'},sub));addK(td,x);return td}
+function lastCell(x){const td=el('td',{class:'num'});td.append(el('b',null,x.lastAmt+'억'),el('div',{class:'note',style:'margin:0'},x.last.slice(2).replace(/-/g,'.')+' · '+x.lastFloor+'층'));return td}
+window.drawCands=function(){const f={};fids.forEach(i=>f[i]=$(i).value);
+  let L=(DATA.cands||[]).filter(c=>inPrice(c.med,f.fPrice)&&(f.fArea==='all'||c.area===f.fArea)&&inRange(c.sq,f.fSize)&&c.built>=+f.fBuilt&&c.commute<=+f.fCom&&kPass(c,f.fHH,f.fSub));
+  if(f.fSort==='rep'){const g={};L.sort((a,b)=>b.n-a.n);L=L.filter(c=>{g[c.area]=(g[c.area]||0)+1;return g[c.area]<=3})}
+  L.sort({rep:(a,b)=>a.area.localeCompare(b.area)||b.n-a.n,n:(a,b)=>b.n-a.n,price:(a,b)=>a.med-b.med,built:(a,b)=>b.built-a.built,com:(a,b)=>a.commute-b.commute||a.med-b.med}[f.fSort]);
+  $('candCount').textContent=`조건에 맞는 단지 ${L.length.toLocaleString()}개 (단지·동·전용면적별)`;
+  const tb=document.querySelector('#candTbl tbody');tb.textContent='';
+  L.slice(0,shown).forEach(x=>{const tr=el('tr');tr.append(nameCell(x,x.area+' '+x.dong),el('td',null,`${x.sq}㎡ (${Math.round(x.sq*0.4)}평형)`),el('td',null,String(x.built)),lastCell(x),el('td',{class:'num'},x.med+'억'),el('td',{class:'num c-hm'},ok(x.rent)),el('td',{class:'num c-hm'},x.ratio==null?'—':x.ratio+'%'),el('td',{class:'num c-hm'},x.n+'건'),(()=>{const td=el('td',{class:'num'});td.append(el('div',null,'약 '+x.commute+'분'),el('div',{class:'route'},comRoute(x.area)));return td})(),needCell(x.med));tb.append(tr)});
+  if(!L.length){const tr=el('tr');tr.append(el('td',{colspan:10},'조건에 맞는 단지가 없습니다.'));tb.append(tr)}
+  const mb=$('candMore');mb.style.display=L.length>shown?'':'none';mb.textContent=`더보기 (${Math.min(shown,L.length)} / ${L.length})`};
+fids.forEach(i=>$(i).addEventListener('change',()=>{shown=20;drawCands()}));$('candMore').onclick=()=>{shown+=20;drawCands()};
+const GUS=['양천','강서','서대문','종로','영등포','마포','용산','동작','서초','강남','송파'];let pGu='강남',pShown=15;
+{const sg=$('popSeg');GUS.forEach(g=>{const b=el('button',{'data-v':g},g);if(g===pGu)b.classList.add('on');sg.append(b)});
+ sg.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;sg.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));pGu=b.dataset.v;pShown=15;drawPop()})}
+window.drawPop=function(){const sz=$('pSize').value,pr=$('pPrice').value,so=$('pSort').value;
+  let L=(DATA.popular||[]).filter(x=>x.area===pGu&&inRange(x.sq,sz)&&inPrice(x.med,pr)&&kPass(x,$('pHH').value,$('pSub').value));
+  L.sort({n:(a,b)=>b.n-a.n,price:(a,b)=>a.med-b.med,built:(a,b)=>b.built-a.built,last:(a,b)=>b.last.localeCompare(a.last)}[so]);
+  $('popCount').textContent=`${pGu}구 ${L.length}개 (단지·동·전용면적별)`;
+  const tb=document.querySelector('#popTbl tbody');tb.textContent='';
+  L.slice(0,pShown).forEach(x=>{const tr=el('tr');tr.append(nameCell(x,pGu+'구 '+x.dong),el('td',null,`${x.sq}㎡ (${Math.round(x.sq*0.4)}평형)`),el('td',null,String(x.built)),lastCell(x),el('td',{class:'num'},x.med+'억'),el('td',{class:'num c-hm'},ok(x.rent)),el('td',{class:'num c-hm'},x.n+'건'),needCell(x.med));tb.append(tr)});
+  if(!L.length){const tr=el('tr');tr.append(el('td',{colspan:8},'조건에 맞는 단지가 없습니다.'));tb.append(tr)}
+  const mb=$('popMore');mb.style.display=L.length>pShown?'':'none';mb.textContent=`더보기 (${Math.min(pShown,L.length)} / ${L.length})`};
+['pSize','pPrice','pHH','pSub','pSort'].forEach(i=>$(i).addEventListener('change',()=>{pShown=15;drawPop()}));$('popMore').onclick=()=>{pShown+=15;drawPop()};
+drawCands();drawPop();
+$('rulesUpd').textContent=RULES.updated||'—';$('dataUpd').textContent=DATA.updated||'—';$('regList').textContent=RULES.regulated||'';
+const nb=$('notices');(RULES.notices||[]).forEach(n=>nb.append(el('div',{class:'notice '+(n.level||'')},n.date+' · '+n.text)));
+})();
+</script>
+</body>
+</html>
