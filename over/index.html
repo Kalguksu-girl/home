@@ -128,7 +128,7 @@ footer{max-width:1120px;margin:0 auto;padding:0 18px 40px;font-size:11.5px;color
 const ok=v=>/^[가-힣]{3}$/.test(v);
 i.addEventListener('input',()=>{const v=i.value.trim();b.disabled=!ok(v);e.textContent=v.length===3&&!ok(v)?'한글 3글자만 입력할 수 있습니다.':''});
 document.getElementById('gateForm').addEventListener('submit',ev=>{ev.preventDefault();const v=i.value.trim();if(!ok(v)){e.textContent='한글 이름 3글자를 입력해 주세요.';return}
-  try{if(window.LOG_URL&&LOG_URL.startsWith('https://'))fetch(LOG_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({name:v,page:'15억 오버',device:/Mobi/i.test(navigator.userAgent)?'모바일':'PC'})})}catch(_){}
+  try{if(window.LOG_URL&&LOG_URL.startsWith('https://')){const q=new URLSearchParams({name:v,page:'15억 오버',device:/Mobi/i.test(navigator.userAgent)?'모바일':'PC'});const img=new Image();img.src=LOG_URL+'?'+q.toString();window._logImg=img;}}catch(_){}
   document.getElementById('gate').remove();document.body.classList.remove('locked')});
 setTimeout(()=>i.focus(),50)})();
 </script>
