@@ -1,0 +1,44 @@
+name: 매일 데이터 갱신
+on:
+  schedule:
+    - cron: '53 21 * * *'   # 매일 06:53 KST
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency: daily
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    env:
+      KEY: ${{ secrets.DATA_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.12' }
+      - name: 키 확인
+        run: test -n "$KEY" || { echo "DATA_KEY 시크릿이 없습니다"; exit 1; }
+      - name: 15억 언더
+        continue-on-error: true
+        run: |
+          cp under/data.json /tmp/u_prev.json; cp under/kapt.json /tmp/uk_prev.json
+          python tools/build_under.py --key "$KEY" --out under/data.json || cp /tmp/u_prev.json under/data.json
+          python tools/guard.py under/data.json /tmp/u_prev.json areas,cands
+          python tools/enrich.py --key "$KEY" --data under/data.json --out under/kapt.json --prev /tmp/uk_prev.json || cp /tmp/uk_prev.json under/kapt.json
+          python tools/guard.py under/kapt.json /tmp/uk_prev.json map
+      - name: 15억 오버
+        continue-on-error: true
+        run: |
+          cp over/data.json /tmp/o_prev.json; cp over/kapt.json /tmp/ok_prev.json
+          python tools/build_over.py --key "$KEY" --out over/data.json || cp /tmp/o_prev.json over/data.json
+          python tools/guard.py over/data.json /tmp/o_prev.json cands,popular
+          python tools/enrich.py --key "$KEY" --data over/data.json --out over/kapt.json --prev /tmp/ok_prev.json || cp /tmp/ok_prev.json over/kapt.json
+          python tools/guard.py over/kapt.json /tmp/ok_prev.json map
+      - name: 사이트에 반영
+        run: |
+          git config user.name Kalguksu-girl
+          git config user.email Kalguksu-girl@users.noreply.github.com
+          git add under over
+          git diff --cached --quiet && { echo "변경 없음"; exit 0; }
+          git commit -m "데이터 갱신 $(TZ=Asia/Seoul date +%F)"
+          git pull --rebase && git push
