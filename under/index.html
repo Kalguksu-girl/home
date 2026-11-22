@@ -180,7 +180,15 @@ $g('gateForm').addEventListener('submit',ev=>{ev.preventDefault();const year=$g(
 <h2>조건 입력 및 결론</h2>
 <div class="top">
 <div class="inputs card">
-  <div class="grp">셀러 파이낸싱 (매도인 대출)</div>
+  <div class="grp">인생 계획</div>
+  <div class="row2">
+    <div class="fg"><label>결혼 예상 연도</label><select id="marry"><option value="0">미정</option></select></div>
+    <div class="fg"><label>시장 전망</label><select id="outlook"><option value="down">27~29년 하락 예상</option><option value="flat">판단 보류</option><option value="up">상승 예상</option></select></div>
+  </div>
+  <div class="fg"><label>월 저축 가능액 (만원)</label><input id="save" type="number" step="10" value="200"><div class="hint">"나의 현실적인 순서"의 연도별 예상 자금과 자금 충분/부족 판정에 반영</div></div>
+  <div class="grp">매수 대상</div>
+  <div class="fg"><label>매수 가격 (만원)</label><input id="price" type="number" step="1000" value="50000"><div class="hint" id="priceHint"></div></div>
+  <div class="grp" style="font-size:12px;border:0;padding-top:4px;margin-top:4px">셀러 파이낸싱 (매도인 대출)</div>
   <div class="row2">
     <div class="fg"><label>매도인 대출 금액 (만원)</label><input id="sf" type="number" step="1000" value="0"></div>
     <div class="fg"><label>매도인 대출 LTV (%)</label><input id="sfltv" type="number" step="1" min="0" max="100" value="0"></div>
@@ -190,15 +198,7 @@ $g('gateForm').addEventListener('submit',ev=>{ev.preventDefault();const year=$g(
     <div class="fg"><label>기간 (년)</label><input id="sfterm" type="number" step="1" value="3"></div>
   </div>
   <div class="fg"><label>상환 방법</label><select id="sfmeth"><option value="bullet">만기일시 (이자만 내다가 만기에 원금)</option><option value="eq">원리금균등</option><option value="prin">원금균등</option></select></div>
-  <div class="hint" id="sfHint"></div>
-  <div class="grp">인생 계획</div>
-  <div class="row2">
-    <div class="fg"><label>결혼 예상 연도</label><select id="marry"><option value="0">미정</option></select></div>
-    <div class="fg"><label>시장 전망</label><select id="outlook"><option value="down">27~29년 하락 예상</option><option value="flat">판단 보류</option><option value="up">상승 예상</option></select></div>
-  </div>
-  <div class="fg"><label>월 저축 가능액 (만원)</label><input id="save" type="number" step="10" value="200"><div class="hint">"나의 현실적인 순서"의 연도별 예상 자금과 자금 충분/부족 판정에 반영</div></div>
-  <div class="grp">매수 대상</div>
-  <div class="fg"><label>매수 가격 (만원)</label><input id="price" type="number" step="1000" value="50000"><div class="hint" id="priceHint"></div></div>
+  <div class="fg"><div class="hint" id="sfHint"></div></div>
   <div class="fg"><label>지역</label><select id="region"><option value="reg">규제지역 (서울 전역·경기 15곳)</option><option value="nonreg">수도권 비규제 (부천·인천·김포·고양 등)</option></select></div>
   <div class="fg"><label>매수 방식</label><select id="mode"><option value="live">직접 입주 (주담대 활용)</option><option value="gap">세입자 있는 집 매수 (전세보증금 승계)</option></select></div>
   <div class="fg" id="jeonseBox"><label>승계할 전세보증금 (만원)</label><input id="jeonse" type="number" step="1000" value="35000"></div>
