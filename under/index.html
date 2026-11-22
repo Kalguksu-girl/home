@@ -180,6 +180,17 @@ $g('gateForm').addEventListener('submit',ev=>{ev.preventDefault();const year=$g(
 <h2>조건 입력 및 결론</h2>
 <div class="top">
 <div class="inputs card">
+  <div class="grp">셀러 파이낸싱 (매도인 대출)</div>
+  <div class="row2">
+    <div class="fg"><label>매도인 대출 금액 (만원)</label><input id="sf" type="number" step="1000" value="0"></div>
+    <div class="fg"><label>매도인 대출 LTV (%)</label><input id="sfltv" type="number" step="1" min="0" max="100" value="0"></div>
+  </div>
+  <div class="row2">
+    <div class="fg"><label>매도인 대출 금리 (%)</label><input id="sfrate" type="number" step="0.1" value="4.5"></div>
+    <div class="fg"><label>기간 (년)</label><input id="sfterm" type="number" step="1" value="3"></div>
+  </div>
+  <div class="fg"><label>상환 방법</label><select id="sfmeth"><option value="bullet">만기일시 (이자만 내다가 만기에 원금)</option><option value="eq">원리금균등</option><option value="prin">원금균등</option></select></div>
+  <div class="hint" id="sfHint"></div>
   <div class="grp">인생 계획</div>
   <div class="row2">
     <div class="fg"><label>결혼 예상 연도</label><select id="marry"><option value="0">미정</option></select></div>
@@ -407,6 +418,12 @@ $g('gateForm').addEventListener('submit',ev=>{ev.preventDefault();const year=$g(
 <details><summary>전세 낀 매수의 위험 (갭투자)</summary><div class="body">
 전세 만기 때 집값·전셋값이 내려가면 보증금 차액을 내가 돌려줘야 함(역전세). 현금 여유가 없으면 대출 불가 상황에서 위험. 전세가율(전세가÷매매가)이 지나치게 높은 단지는 하락기 위험이 큼.
 </div></details>
+<details><summary>셀러 파이낸싱(매도인 대출)이 뭔가요</summary><div class="body">
+<p>집주인(매도인)이 잔금 일부를 바로 받지 않고 매수인에게 빌려주는 방식입니다. 소유권을 넘기면서 그 집에 매도인 명의 근저당을 잡고, 매수인은 이자를 냅니다. 은행 대출 한도(15억 이하 6억 등)가 막히면서 2026년 들어 늘었고, 법으로 금지된 거래는 아닙니다.</p>
+<ul><li><b>보통 얼마나:</b> 정해진 기준은 없고 협상입니다. 보도된 예로는 20억 집에 매도인 6억(집값의 30%), 은행 4억과 합쳐 집값의 50% 수준. 광고로는 "근저당 최대 10억"까지 나옵니다. 금리는 시중 은행 금리 수준이 많습니다.</li>
+<li><b>순서:</b> 은행이 1순위, 매도인이 2순위 근저당을 잡는 구조가 일반적입니다.</li>
+<li><b>주의:</b> 은행 DSR 심사 밖의 빚이라 갚을 능력은 스스로 따져야 합니다. 만기일시면 만기에 원금을 한꺼번에 갚아야 하고, 못 갚으면 집이 경매로 갈 수 있습니다. 토지거래허가구역에서는 자금조달계획서에 차입금으로 적어야 하고, 실거주 의무는 그대로입니다. 시세보다 비싸게 부르고 대출을 붙이는 매물도 있어 가격을 실거래와 비교하세요. 계약서는 금리·기간·상환 방법을 적고 공증받는 것이 일반적입니다.</li></ul>
+</div></details>
 <details><summary>대출 관련 함정</summary><div class="body">
 신용대출 1억 초과 보유자는 1년간 규제지역 주택 구입 제한. 미사용 마이너스통장도 한도 전액이 DSR에 반영. 자금조달계획서에 적은 자금 출처는 증빙 필요(가족 차용 시 차용증·이자 이체 내역).
 </div></details>
@@ -465,7 +482,7 @@ const P=Object.assign({ltv_reg_general:.4,ltv_reg_first:.7,ltv_reg_seomin:.6,seo
 const $=id=>document.getElementById(id);
 const F=v=>Math.round(v).toLocaleString();
 const E=v=>{const a=Math.abs(v);return (v<0?'−':'')+(a>=10000?(a/10000).toFixed(a>=100000?1:2).replace(/\.?0+$/,'')+'억':Math.round(a).toLocaleString()+'만')};
-const ids=['marry','outlook','save','price','region','mode','jeonse','own','income','rate','term','rtype','lmeth','credit','cash','dc','corp','crate','cterm','cmeth','ins','family'];
+const ids=['marry','outlook','save','price','region','mode','jeonse','own','income','rate','term','rtype','lmeth','credit','cash','dc','corp','crate','cterm','cmeth','ins','family','sf','sfltv','sfrate','sfterm','sfmeth'];
 const NOW=new Date().getFullYear();{const m=document.getElementById('marry');for(let y=NOW+1;y<=NOW+10;y++){const o=document.createElement('option');o.value=y;o.textContent=y+'년';m.append(o)}m.value=String(NOW+3)}
 try{const s=JSON.parse(localStorage.getItem('buytool')||'{}');ids.forEach(i=>{if(s[i]!=null)$(i).value=s[i]})}catch(e){}
 if(window.GATE){document.getElementById('cash').value=window.GATE.cash;document.getElementById('income').value=window.GATE.income}
@@ -502,20 +519,22 @@ function compute(v,priceOverride){
   if(gap){loan=0;bind='전세 승계(주담대 미사용)'}
   const tax=acqTax(p,first), fee=brok(p), etc=p*.003;
   const need=p+tax+fee+etc;
-  const extra=v.dc+v.corp+v.ins+v.family;
+  const extra=v.dc+v.corp+v.ins+v.family+(v.sf||0);
   const have=v.cash+extra+loan+(gap?v.jeonse:0);
-  return {p,cap,ltv,ltvName,ltvAmt,ratio,sRate,annual,creditPay,avail,dsrAmt,loan,bind,tax,fee,etc,need,extra,have,diff:have-need,monthly:payFirst(v.lmeth,v.rate,v.term,loan),corpM:payFirst(v.cmeth,v.crate,v.cterm,v.corp),gap,reg,first,owner};
+  return {p,cap,ltv,ltvName,ltvAmt,ratio,sRate,annual,creditPay,avail,dsrAmt,loan,bind,tax,fee,etc,need,extra,have,diff:have-need,monthly:payFirst(v.lmeth,v.rate,v.term,loan),corpM:payFirst(v.cmeth,v.crate,v.cterm,v.corp),sfM:payFirst(v.sfmeth,v.sfrate,v.sfterm,v.sf||0),gap,reg,first,owner};
 }
 function maxPrice(v){let lo=0,hi=400000;
   if(v.mode==='gap'){ // jeonse fixed proportion of price
     const ratio=v.jeonse/v.price;let l=0,h=400000;for(let i=0;i<40;i++){const m=(l+h)/2;const r=compute({...v,jeonse:m*ratio},m);if(r.diff>=0)l=m;else h=m}return l}
   for(let i=0;i<40;i++){const m=(lo+hi)/2;if(compute(v,m).diff>=0)lo=m;else hi=m}return lo}
 
+function sfSync(src){const p=parseFloat($('price').value)||0,a=$('sf'),l=$('sfltv');if(src==='sfltv')a.value=Math.round(p*(parseFloat(l.value)||0)/100/100)*100;else l.value=p?Math.round((parseFloat(a.value)||0)/p*1000)/10:0}
 function render(){
   const v={};ids.forEach(i=>{const x=$(i);v[i]=x.tagName==='SELECT'?x.value:(parseFloat(x.value)||0)});
   try{localStorage.setItem('buytool',JSON.stringify(v))}catch(e){}
   $('jeonseBox').style.display=v.mode==='gap'?'':'none';
   $('priceHint').textContent='= '+E(v.price);
+  {const r0=compute(v);const bank=r0.gap?0:r0.loan;$('sfHint').textContent=v.sf?`= ${E(v.sf)} · 은행 주담대 ${E(bank)} + 매도인 ${E(v.sf)} → 합산 LTV ${((bank+v.sf)/v.price*100).toFixed(0)}%`:'금액이나 LTV 중 하나만 넣으면 나머지는 자동 계산. 보도 사례: 20억 집에 매도인 6억(30%), 은행 4억과 합쳐 50%'}
   const r=compute(v);const mp=maxPrice(v);
   // verdict
   const vd=$('verdict');vd.className='verdict '+(r.diff>=0?'ok':'no');vd.textContent='';
@@ -523,16 +542,17 @@ function render(){
   vd.append(el('div',{class:'big'},r.diff>=0?`매수 가능 · 여유 ${E(r.diff)}`:`자금 부족 · ${E(-r.diff)} 더 필요`));
   const ul=el('ul');
   ul.append(el('li',null,`지금 조건으로 살 수 있는 최대 가격: 약 ${E(mp)}`));
-  if(!r.gap)ul.append(el('li',null,`은행 대출 가능액 ${E(r.loan)} (${r.bind} 때문에 이 금액에서 막힘) · 매달 갚을 돈 약 ${E(r.monthly+r.corpM)}${v.corp?' (사내대출 포함)':''}${v.lmeth==='prin'||v.cmeth==='prin'?', 첫 달 기준':''}`));
+  if(!r.gap)ul.append(el('li',null,`은행 대출 가능액 ${E(r.loan)} (${r.bind} 때문에 이 금액에서 막힘) · 매달 갚을 돈 약 ${E(r.monthly+r.corpM+r.sfM)}${v.corp||v.sf?' ('+[v.corp?'사내대출':'',v.sf?'매도인 대출':''].filter(Boolean).join('·')+' 포함)':''}${v.lmeth==='prin'||v.cmeth==='prin'?', 첫 달 기준':''}`));
   else ul.append(el('li',null,`전세 ${E(v.jeonse)} 승계 · 실투자금(갭+부대비용) ${E(r.need-v.jeonse)}`));
   if(r.reg&&r.gap)ul.append(el('li',null,'규제지역 전세 낀 매수: 2026-05-12 이후 계속 무주택인 경우에만 가능, 임대차 종료 후 2년 실거주(최종 입주 2029년)'));
   else if(r.reg)ul.append(el('li',null,'규제지역: 허가 후 4개월 내 입주, 2년 실거주 의무'));
   else ul.append(el('li',null,'비규제 지역: 실거주 의무 없음, 전세 낀 매수 가능'));
+  if(v.sf){const tot=(r.gap?v.jeonse:r.loan)+v.sf;ul.append(el('li',null,`매도인 대출 ${E(v.sf)} (집값의 ${(v.sf/r.p*100).toFixed(0)}%) 포함 · ${r.gap?'전세+매도인 대출':'은행+매도인 대출'} 합산 ${E(tot)} = 집값의 ${(tot/r.p*100).toFixed(0)}%`))}
   vd.append(ul);
   // kpis
   const k=$('kpis');k.textContent='';
   [['총 필요자금',E(r.need),'매수가+취득세+중개+기타'],['조달 가능 자금',E(r.have),r.gap?'현금+추가자금+전세':'현금+추가자금+주담대'],['과부족',(r.diff>=0?'+':'')+E(r.diff),'조달 − 필요'],
-   ['주담대 한도',E(r.loan),r.gap?'미사용':r.bind+' 기준'],['월 상환액',E((r.gap?0:r.monthly)+r.corpM),`월소득 대비 ${(((r.gap?0:r.monthly)+r.corpM)/(v.income/12)*100||0).toFixed(0)}%`+(v.lmeth==='prin'||v.cmeth==='prin'?' · 첫 달':'')],['최대 매수가',E(mp),'현 조건 역산']]
+   ['주담대 한도',E(r.loan),r.gap?'미사용':r.bind+' 기준'],['월 상환액',E((r.gap?0:r.monthly)+r.corpM+r.sfM),`월소득 대비 ${(((r.gap?0:r.monthly)+r.corpM+r.sfM)/(v.income/12)*100||0).toFixed(0)}%`+(v.lmeth==='prin'||v.cmeth==='prin'?' · 첫 달':'')],['최대 매수가',E(mp),'현 조건 역산']]
    .forEach(([l,x,n],i)=>{const d=el('div',{class:'kpi'});const vv=el('div',{class:'v'+(i===2?(r.diff>=0?' pos':' neg'):'')},x);d.append(el('div',{class:'l'},l),vv,el('div',{class:'n'},n));k.append(d)});
   // flags
   const fl=$('flags');fl.textContent='';
@@ -541,6 +561,7 @@ function render(){
   if(r.first&&!r.gap)add('생애최초 LTV 적용 시 6개월 내 전입 의무. 한 번 매수하면 본인 생애최초 자격 소멸','info');
   if(r.owner)add('1주택을 계속 보유하면 수도권 주담대 불가(LTV 0%). 처분 조건부로 바꾸면 40%');
   if(!r.gap&&v.price<=60000&&!r.owner){const lim=r.first?24000:20000;if((r.first&&v.income<=7000)||(!r.first&&v.income<=6000))add(`디딤돌대출 소득요건 충족 가능 → 한도 ${E(lim)}, DSR 미적용 (주택가격 5억 이하 조건)`,'info')}
+  if(v.sf){add('매도인 대출은 은행 LTV·DSR 심사 밖의 개인 간 빚. 은행이 1순위, 매도인이 2순위 근저당을 잡는 구조가 일반적이고, 토허구역은 자금조달계획서에 차입금으로 적어야 함');if(v.sfmeth==='bullet')add(`만기일시: ${v.sfterm}년 뒤 원금 ${E(v.sf)}을 한 번에 갚아야 함 (재대출·매도 계획 필요)`)}
   if(r.gap)add('전세 낀 매수는 만기 때 전셋값이 내려가면 차액을 돌려줘야 함(역전세). 여유 현금 확보 필요');
   // loan table
   const lt=$('loanTbl');lt.textContent='';
@@ -552,12 +573,13 @@ function render(){
   const mName={eq:'원리금균등',prin:'원금균등',bullet:'만기일시'};
   if(!r.gap&&r.loan)row('주담대 상환',`${mName[v.lmeth]} · ${v.rate}% · ${v.term}년 → 첫 달 ${E(payFirst(v.lmeth,v.rate,v.term,r.loan))}, 마지막 달 ${E(payLast(v.lmeth,v.rate,v.term,r.loan))}, 총이자 ${E(totalInt(v.lmeth,v.rate,v.term,r.loan))}`,E(payFirst(v.lmeth,v.rate,v.term,r.loan))+'/월');
   if(v.corp)row('사내대출 상환',`${mName[v.cmeth]} · ${v.crate}% · ${v.cterm}년 → 첫 달 ${E(r.corpM)}, `+(v.cmeth==='bullet'?`만기에 원금 ${E(v.corp)} 일시상환`:`마지막 달 ${E(payLast(v.cmeth,v.crate,v.cterm,v.corp))}`)+`, 총이자 ${E(totalInt(v.cmeth,v.crate,v.cterm,v.corp))}. 은행 DSR에는 미포함(회사 자체 재원 기준)`,E(r.corpM)+'/월');
+  if(v.sf)row('매도인 대출 상환',`${mName[v.sfmeth]} · ${v.sfrate}% · ${v.sfterm}년 → 첫 달 ${E(r.sfM)}, `+(v.sfmeth==='bullet'?`만기에 원금 ${E(v.sf)} 일시상환`:`마지막 달 ${E(payLast(v.sfmeth,v.sfrate,v.sfterm,v.sf))}`)+`, 총이자 ${E(totalInt(v.sfmeth,v.sfrate,v.sfterm,v.sf))}. 은행 DSR·LTV 심사에는 미포함`,E(r.sfM)+'/월');
   // need/have
   const nt=$('needTbl');nt.textContent='';
   [['매수 가격',r.p],['취득세'+(r.first&&r.p<=120000?' (생애최초 감면 반영)':''),r.tax],['중개보수',r.fee],['법무·등기·이사 등',r.etc]].forEach(([a,b])=>{const tr=el('tr');tr.append(el('td',null,a),el('td',{class:'num'},E(b)));nt.append(tr)});
   {const tr=el('tr',{class:'sum'});tr.append(el('td',null,'합계'),el('td',{class:'num'},E(r.need)));nt.append(tr)}
   const ht=$('haveTbl');ht.textContent='';
-  const hv=[['보유 현금',v.cash],['퇴직연금 중도인출',v.dc],['사내대출',v.corp],['약관·예적금담보',v.ins],['가족 증여·차용',v.family]];
+  const hv=[['보유 현금',v.cash],['퇴직연금 중도인출',v.dc],['사내대출',v.corp],['약관·예적금담보',v.ins],['가족 증여·차용',v.family],['매도인 대출 (셀러 파이낸싱)',v.sf||0]];
   if(r.gap)hv.push(['전세보증금 승계',v.jeonse]);else hv.push(['주담대',r.loan]);
   hv.forEach(([a,b])=>{const tr=el('tr');tr.append(el('td',null,a),el('td',{class:'num'},E(b)));ht.append(tr)});
   {const tr=el('tr',{class:'sum'});tr.append(el('td',null,'합계'),el('td',{class:'num'},E(r.have)));ht.append(tr)}
@@ -601,6 +623,7 @@ function roadmap(v,r){
   steps.forEach(s=>{const li=el('li');li.append(el('div',{class:'when'},s.when));const w=el('div',{class:'what'});const b=el('b',null,s.title);if(s.okFlag!==undefined){b.append(el('span',{class:s.okFlag?'ok':'ng'},s.okFlag?'  ✓ 자금 충분':'  ✗ 자금 부족'))}w.append(b,el('span',null,s.desc));li.append(w);ol.append(li)});
   box.append(ol);
 }
+['sf','price'].forEach(i=>$(i).addEventListener('input',()=>sfSync('sf')));$('sfltv').addEventListener('input',()=>sfSync('sfltv'));
 ids.forEach(i=>{$(i).addEventListener('input',render);$(i).addEventListener('change',render)});
 render();
 // candidates
